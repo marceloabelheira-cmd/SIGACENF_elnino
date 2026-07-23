@@ -16,6 +16,13 @@
     /* institutional accent — reserved for UI chrome (nav, headers, tags); charts keep --series-1 */
     --brand:#184f95; --brand-soft:#e7eefb;
     --critical-soft:#fbe4e2;
+    --shadow-1:0 1px 2px rgba(11,11,11,0.04), 0 1px 1px rgba(11,11,11,0.03);
+    --shadow-2:0 4px 14px rgba(11,11,11,0.07), 0 1px 2px rgba(11,11,11,0.05);
+    /* sidebar chrome — fixed navy + amber identity, constant across light/dark content theme */
+    --sb-bg-top:#123a68; --sb-bg-bottom:#0b2648;
+    --sb-text:rgba(255,255,255,.94); --sb-text-muted:rgba(255,255,255,.56);
+    --sb-border:rgba(255,255,255,.12); --sb-hover:rgba(255,255,255,.07); --sb-active:rgba(255,255,255,.12);
+    --accent-warm:#eda100; --accent-warm-ink:#0b2648;
     color-scheme: light;
   }
   [data-theme="dark"]{
@@ -28,71 +35,88 @@
     --success-text:#0ca30c;
     --brand:#86b6ef; --brand-soft:#17263c;
     --critical-soft:#3a1c1c;
+    --shadow-1:0 1px 2px rgba(0,0,0,0.35);
+    --shadow-2:0 6px 18px rgba(0,0,0,0.4);
     color-scheme: dark;
   }
   *{box-sizing:border-box;}
   body{
     margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background:var(--page); color:var(--text-primary);
+    background:var(--page); color:var(--text-primary); -webkit-font-smoothing:antialiased;
   }
   a{color:var(--brand);}
+  a:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var(--brand); outline-offset:2px; border-radius:4px;}
   .app{display:flex; min-height:100vh;}
   /* ---------- SIDEBAR ---------- */
   .sidebar{
-    width:250px; flex-shrink:0; background:var(--surface-2); border-right:1px solid var(--border);
-    display:flex; flex-direction:column; padding:20px 14px; position:sticky; top:0; height:100vh; overflow-y:auto;
+    width:258px; flex-shrink:0; background:linear-gradient(178deg, var(--sb-bg-top) 0%, var(--sb-bg-bottom) 100%);
+    display:flex; flex-direction:column; padding:22px 14px; position:sticky; top:0; height:100vh; overflow-y:auto;
+    box-shadow:1px 0 0 rgba(0,0,0,.15);
   }
-  .brand{padding:4px 10px 20px 10px; display:flex; align-items:flex-start; gap:11px;}
+  .brand{padding:2px 10px 22px 10px; display:flex; align-items:flex-start; gap:11px; border-bottom:1px solid var(--sb-border); margin-bottom:14px;}
   .brand .monogram{
-    flex-shrink:0; width:34px; height:34px; border-radius:9px; background:#184f95; color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700;
-    letter-spacing:.01em;
+    flex-shrink:0; width:36px; height:36px; border-radius:9px; background:var(--accent-warm); color:var(--accent-warm-ink);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
+    letter-spacing:.01em; box-shadow:0 2px 6px rgba(0,0,0,.25);
   }
-  .brand .name{font-size:18px; font-weight:700; letter-spacing:-0.01em; margin-top:1px;}
-  .brand .sub{font-size:11px; color:var(--text-secondary); margin-top:3px; line-height:1.45;}
-  nav.mainnav{display:flex; flex-direction:column; gap:1px; margin-top:8px;}
+  .brand .name{font-size:18.5px; font-weight:700; letter-spacing:-0.01em; margin-top:1px; color:var(--sb-text);}
+  .brand .sub{font-size:11px; color:var(--sb-text-muted); margin-top:3px; line-height:1.45;}
+  .brand .sub-committee{font-size:13.5px; font-weight:700; color:var(--sb-text); margin-top:5px; letter-spacing:.005em;}
+  nav.mainnav{display:flex; flex-direction:column; gap:2px; margin-top:2px;}
   nav.mainnav button{
     all:unset; cursor:pointer; box-sizing:border-box; padding:10px 12px 10px 14px; font-size:13.5px;
-    color:var(--text-secondary); font-weight:500; display:flex; align-items:center; gap:10px;
+    color:var(--sb-text-muted); font-weight:500; display:flex; align-items:center; gap:11px;
     border-left:3px solid transparent; border-radius:0 8px 8px 0; transition:background .12s, border-color .12s, color .12s;
   }
-  nav.mainnav button:hover{background:var(--page); color:var(--text-primary); border-left-color:var(--grid);}
+  nav.mainnav button:hover{background:var(--sb-hover); color:var(--sb-text); border-left-color:rgba(255,255,255,.25);}
   nav.mainnav button.active{
-    background:var(--brand-soft); color:var(--brand); font-weight:700; letter-spacing:.005em;
-    border-left-color:var(--brand);
+    background:var(--sb-active); color:#fff; font-weight:700; letter-spacing:.005em;
+    border-left-color:var(--accent-warm);
   }
-  .sidebar-foot{margin-top:auto; padding-top:16px; border-top:1px solid var(--border);}
+  .nav-icon{flex-shrink:0; width:16px; height:16px; opacity:.8;}
+  nav.mainnav button.active .nav-icon{opacity:1; color:var(--accent-warm);}
+  .sidebar-foot{margin-top:auto; padding-top:16px; border-top:1px solid var(--sb-border);}
   .sidebar-foot .badge{
-    font-size:10.5px; color:var(--text-muted); line-height:1.55; letter-spacing:.01em;
+    font-size:10.5px; color:var(--sb-text-muted); line-height:1.55; letter-spacing:.01em;
   }
   .theme-toggle{
-    all:unset; cursor:pointer; font-size:11.5px; color:var(--text-secondary); font-weight:500;
-    border:1px solid var(--border); padding:6px 12px; border-radius:20px; margin-top:12px;
-    display:inline-flex; align-items:center; gap:7px; transition:border-color .12s, color .12s;
+    all:unset; cursor:pointer; font-size:11.5px; color:var(--sb-text-muted); font-weight:500;
+    border:1px solid var(--sb-border); padding:6px 12px; border-radius:20px; margin-top:12px;
+    display:inline-flex; align-items:center; gap:7px; transition:border-color .12s, color .12s, background .12s;
   }
-  .theme-toggle:hover{border-color:var(--brand); color:var(--brand);}
+  .theme-toggle:hover{border-color:var(--accent-warm); color:var(--accent-warm); background:var(--sb-hover);}
   /* ---------- MAIN ---------- */
   main{flex:1; padding:28px 36px 60px 36px; max-width:1180px;}
   .view{display:none;}
   .view.active{display:block;}
-  .view-header{border-bottom:1px solid var(--grid); padding-bottom:18px; margin-bottom:24px;}
-  .eyebrow{font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--brand); margin:0 0 7px 0;}
-  h1{font-size:23px; margin:0 0 6px 0; letter-spacing:-0.01em; font-weight:700;}
+  .view-header{border-bottom:2px solid var(--grid); padding-bottom:18px; margin-bottom:26px; position:relative;}
+  .view-header::after{content:''; position:absolute; left:0; bottom:-2px; width:56px; height:2px; background:var(--accent-warm);}
+  .eyebrow{font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--brand); margin:0 0 8px 0; display:flex; align-items:center; gap:7px;}
+  .eyebrow::before{content:''; width:7px; height:7px; border-radius:2px; background:var(--accent-warm); display:inline-block;}
+  h1{font-size:26px; margin:0 0 7px 0; letter-spacing:-0.015em; font-weight:800;}
   h2{font-size:19px; margin:0 0 2px 0;}
   .view-intro{color:var(--text-secondary); font-size:14px; margin:0; max-width:760px; line-height:1.6;}
   .card{
     background:var(--surface-1); border:1px solid var(--border); border-radius:12px;
-    padding:20px 22px; margin-bottom:18px;
+    padding:20px 22px; margin-bottom:18px; box-shadow:var(--shadow-1);
   }
   .card h3{margin:0 0 14px 0; padding-bottom:11px; border-bottom:1px solid var(--grid); font-size:14.5px; font-weight:700; letter-spacing:.01em;}
   .card h3 .n{color:var(--text-muted); font-weight:500; margin-right:6px;}
   /* stat tiles */
   .stats-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; margin-bottom:20px;}
-  .stat-tile{background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:18px 18px 16px 18px; position:relative; overflow:hidden;}
+  .stat-tile{background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:18px 18px 16px 18px; position:relative; overflow:hidden; box-shadow:var(--shadow-1); transition:box-shadow .15s, transform .15s;}
+  .stat-tile:hover{box-shadow:var(--shadow-2); transform:translateY(-1px);}
   .stat-tile::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--brand); opacity:.5;}
   .stat-tile .label{font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.045em; color:var(--text-muted); margin-bottom:8px;}
   .stat-tile .value{font-size:30px; font-weight:600; letter-spacing:-0.02em;}
   .stat-tile .value .unit{font-size:14px; color:var(--text-muted); font-weight:500; margin-left:4px;}
+  .stat-tile.link{cursor:pointer; font:inherit; text-align:left; width:100%; -webkit-appearance:none; appearance:none;}
+  .stat-tile.link:hover{border-color:var(--brand);}
+  .stat-tile .stat-goto{
+    display:block; font-size:10px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:.05em;
+    margin-top:8px; opacity:0; transition:opacity .12s;
+  }
+  .stat-tile.link:hover .stat-goto{opacity:1;}
   /* two-col layout */
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
   @media (max-width:920px){ .grid2{grid-template-columns:1fr;} .app{flex-direction:column;} .sidebar{width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap;} nav.mainnav{flex-direction:row; flex-wrap:wrap;} main{padding:20px;} }
@@ -106,21 +130,33 @@
     transition:width .5s ease;
   }
   .barrow .val{font-size:12.5px; color:var(--text-secondary); font-variant-numeric:tabular-nums;}
-  details.tableview{margin-top:12px;}
-  details.tableview summary{cursor:pointer; font-size:12.5px; color:var(--brand); font-weight:700; user-select:none;}
+  details.tableview{margin-top:14px;}
+  details.tableview summary{
+    cursor:pointer; font-size:12px; color:var(--brand); font-weight:700; user-select:none; list-style:none;
+    display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:20px; border:1px solid var(--border);
+    transition:border-color .12s, background .12s;
+  }
+  details.tableview summary::-webkit-details-marker{display:none;}
+  details.tableview summary:hover{border-color:var(--brand); background:var(--brand-soft);}
+  details.tableview summary::before{content:'▤'; font-size:11px;}
+  details.tableview[open] summary::before{content:'▾';}
   table.dtable{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;}
-  table.dtable th, table.dtable td{text-align:left; padding:7px 10px; border-bottom:1px solid var(--grid);}
+  table.dtable th, table.dtable td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--grid);}
   table.dtable th{color:var(--text-muted); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em;}
   table.dtable td.num{font-variant-numeric:tabular-nums; text-align:right;}
+  table.dtable tbody tr{transition:background .1s;}
+  table.dtable tbody tr:nth-child(even){background:var(--page);}
+  table.dtable tbody tr:hover{background:var(--brand-soft);}
   /* decree accordion */
-  .accordion-item{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; background:var(--surface-1); transition:border-color .12s;}
-  .accordion-item.open{border-color:var(--brand);}
+  .accordion-item{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; background:var(--surface-1); transition:border-color .12s, box-shadow .12s; box-shadow:var(--shadow-1);}
+  .accordion-item.open{border-color:var(--brand); box-shadow:var(--shadow-2);}
   .accordion-head{
     all:unset; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:14px;
     padding:14px 18px; width:100%; font-size:14.5px; box-sizing:border-box; transition:background .12s;
   }
   .accordion-head:hover{background:var(--page);}
   .accordion-head:focus-visible{outline:2px solid var(--brand); outline-offset:-2px;}
+  .accordion-item.open > .accordion-head{background:var(--brand-soft);}
   .accordion-head .acc-title{font-weight:700; color:var(--text-primary);}
   .acc-hint{display:flex; align-items:center; gap:9px; flex-shrink:0;}
   .hint-text{font-size:11px; font-weight:500; color:var(--text-muted); white-space:nowrap; font-style:italic;}
@@ -134,20 +170,46 @@
   .accordion-body ol li, .accordion-body ul li{margin-bottom:8px;}
   /* org chart */
   .orgchart{display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 0 4px 0;}
-  .oc-box{border:1.5px solid var(--border); background:var(--surface-2); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:600; text-align:center; min-width:180px;}
+  .oc-box{border:1.5px solid var(--border); background:var(--surface-2); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:600; text-align:center; min-width:180px; box-shadow:var(--shadow-1);}
   .oc-box.accent{border-color:var(--brand); color:var(--brand); background:var(--brand-soft);}
+  .oc-box.link{
+    all:unset; box-sizing:border-box; border:1.5px solid var(--border); background:var(--surface-2); border-radius:10px;
+    padding:10px 16px; font-size:13px; font-weight:600; text-align:center; min-width:180px; box-shadow:var(--shadow-1);
+    color:var(--text-primary); font-family:inherit; cursor:pointer; display:block;
+    transition:border-color .12s, box-shadow .15s, transform .15s;
+  }
+  .oc-box.link:hover{border-color:var(--brand); box-shadow:var(--shadow-2); transform:translateY(-1px);}
+  .oc-box.link .oc-goto{
+    display:block; font-size:10px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:.05em;
+    margin-top:5px; opacity:0; transition:opacity .12s;
+  }
+  .oc-box.link:hover .oc-goto{opacity:1;}
   .oc-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  @keyframes camaraFlash{
+    0%{box-shadow:0 0 0 4px var(--brand);}
+    100%{box-shadow:0 0 0 4px transparent;}
+  }
+  .camara-card.flash, .card.flash{animation:camaraFlash .9s ease-out 2;}
   .oc-connector{width:1.5px; height:18px; background:var(--baseline);}
   .oc-sub{font-size:11px; font-weight:400; color:var(--text-secondary); display:block; margin-top:2px;}
   .oc-tier-label{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin:2px 0;}
   /* camaras cards */
-  .searchbar{margin-bottom:16px;}
-  .searchbar input{
-    width:100%; max-width:420px; padding:9px 14px; border-radius:8px; border:1px solid var(--border);
-    background:var(--surface-2); color:var(--text-primary); font-size:14px; transition:border-color .12s;
+  .searchbar{margin-bottom:16px; position:relative; max-width:420px;}
+  .searchbar::before{
+    content:''; position:absolute; left:13px; top:50%; width:14px; height:14px; margin-top:-7px;
+    border:1.5px solid var(--text-muted); border-radius:50%; box-sizing:border-box; pointer-events:none;
   }
-  .searchbar input:focus{outline:none; border-color:var(--brand);}
-  .camara-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-1); margin-bottom:16px; overflow:hidden;}
+  .searchbar::after{
+    content:''; position:absolute; left:23px; top:50%; width:6px; height:1.5px; margin-top:5px;
+    background:var(--text-muted); transform:rotate(45deg); transform-origin:left center; pointer-events:none;
+  }
+  .searchbar input{
+    width:100%; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary); font-size:14px;
+    transition:border-color .12s, box-shadow .12s;
+  }
+  .searchbar input:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft);}
+  .camara-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-1); margin-bottom:16px; overflow:hidden; box-shadow:var(--shadow-1);}
   .camara-head{padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); border-top:3px solid var(--brand);}
   .camara-head .tag{font-size:11px; font-weight:700; color:var(--brand); letter-spacing:.04em; text-transform:uppercase;}
   .camara-head h3{margin:2px 0 8px 0; font-size:16px; font-weight:700; border:none; padding:0;}
@@ -161,6 +223,7 @@
   }
   .eixo-head:hover{background:var(--page);}
   .eixo-head:focus-visible{outline:2px solid var(--brand); outline-offset:-2px;}
+  .eixo-item.open > .eixo-head{background:var(--brand-soft);}
   .eixo-kicker{font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brand); display:block; margin-bottom:4px;}
   .eixo-tema{font-size:16px; font-weight:700; color:var(--text-primary); line-height:1.3;}
   .eixo-body{display:none; padding:0 20px 18px 20px;}
@@ -196,7 +259,8 @@
   .pdf-btn.primary:hover{opacity:.88; color:#fff;}
   /* roadmap */
   .module-list{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
-  .module{border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:var(--surface-1);}
+  .module{border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:var(--surface-1); box-shadow:var(--shadow-1); transition:box-shadow .15s, transform .15s;}
+  .module:hover{box-shadow:var(--shadow-2); transform:translateY(-1px);}
   .module .mnum{font-size:10.5px; font-weight:700; color:var(--brand); margin-bottom:5px; letter-spacing:.06em; text-transform:uppercase;}
   .module h4{margin:0 0 6px 0; font-size:14.5px; font-weight:700;}
   .module p{margin:0; font-size:13px; color:var(--text-secondary); line-height:1.55;}
@@ -215,20 +279,42 @@
       <div class="monogram">SG</div>
       <div>
         <div class="name">SiGACEnf</div>
-        <div class="sub">Sistema de Gestão das Ações Coordenadas de Enfrentamento<br>Comitê El Niño · Estado do Rio de Janeiro</div>
+        <div class="sub">Sistema de Gestão das Ações Coordenadas de Enfrentamento</div>
+        <div class="sub-committee">Comitê El Niño · RJ</div>
       </div>
     </div>
     <nav class="mainnav" id="mainnav">
-      <button data-view="visao-geral" class="active">Visão Geral</button>
-      <button data-view="decreto">O Decreto 50.357/2026</button>
-      <button data-view="governanca">Estrutura de Governança</button>
-      <button data-view="camaras">Câmaras Técnicas</button>
-      <button data-view="orgaos">Órgãos &amp; Participação</button>
-      <button data-view="roadmap">Roadmap do Sistema</button>
+      <button data-view="visao-geral" class="active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.6" y="1.6" width="5.6" height="5.6" rx="1"/><rect x="8.8" y="1.6" width="5.6" height="5.6" rx="1"/><rect x="1.6" y="8.8" width="5.6" height="5.6" rx="1"/><rect x="8.8" y="8.8" width="5.6" height="5.6" rx="1"/></svg>
+        <span>Visão Geral</span>
+      </button>
+      <button data-view="decreto">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.6h5.2L12.4 4.8V14.4H4z"/><path d="M9.2 1.6v3.2h3.2"/><line x1="5.6" y1="8.4" x2="10.4" y2="8.4"/><line x1="5.6" y1="11" x2="10.4" y2="11"/></svg>
+        <span>O Decreto 50.357/2026</span>
+      </button>
+      <button data-view="governanca">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="2.8" r="1.5"/><circle cx="3" cy="12.6" r="1.5"/><circle cx="13" cy="12.6" r="1.5"/><path d="M8 4.3v2.5M8 6.8 3 11.1M8 6.8l5 4.3"/></svg>
+        <span>Estrutura de Governança</span>
+      </button>
+      <button data-view="camaras">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.8 1.8 5.4 8 9l6.2-3.6z"/><path d="M1.8 8.6 8 12.2l6.2-3.6"/><path d="M1.8 11.8 8 15.4l6.2-3.6"/></svg>
+        <span>Câmaras Técnicas</span>
+      </button>
+      <button data-view="orgaos">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14.6h12"/><path d="M3.4 14.6V6.2L8 2.6l4.6 3.6v8.4"/><line x1="6" y1="9.4" x2="6" y2="14.6"/><line x1="10" y1="9.4" x2="10" y2="14.6"/></svg>
+        <span>Órgãos &amp; Participação</span>
+      </button>
+      <button data-view="roadmap">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3.2" y1="1.6" x2="3.2" y2="14.6"/><path d="M3.2 2.6h8l-2.1 2.7 2.1 2.7h-8"/></svg>
+        <span>Roadmap do Sistema</span>
+      </button>
     </nav>
     <div class="sidebar-foot">
       <div class="badge">Base legal: Decreto Estadual nº 50.357, de 02/07/2026, e definições internas das Câmaras Técnicas.<br>Versão v0.1 · painel de consulta preliminar.</div>
-      <button class="theme-toggle" id="themeToggle">🌓 Alternar tema</button>
+      <button class="theme-toggle" id="themeToggle">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2"/><path d="M8 1.2v1.6M8 13.2v1.6M2.4 8H.8M15.2 8h-1.6M3.5 3.5l1.2 1.2M11.3 11.3l1.2 1.2M12.5 3.5l-1.2 1.2M4.7 11.3l-1.2 1.2"/></svg>
+        <span>Alternar tema</span>
+      </button>
     </div>
   </aside>
 
@@ -280,6 +366,7 @@
           <div class="pdf-cta-actions">
             <a id="pdfOpenBtn" class="pdf-btn primary" target="_blank" rel="noopener">Abrir PDF</a>
             <a id="pdfDownloadBtn" class="pdf-btn" download="Decreto_50357_2026_Comite_El_Nino.pdf">Baixar</a>
+            <a id="pdfOnlineBtn" class="pdf-btn" href="https://leisestaduais.com.br/rj/decreto-n-50357-2026-rio-de-janeiro-institui-o-comite-estadual-de-enfrentamento-aos-efeitos-do-el-nino-no-ambito-do-estado-do-rio-de-janeiro-e-da-outras-providencias?origin=instituicao" target="_blank" rel="noopener">Ver on-line</a>
           </div>
         </div>
       </div>
@@ -342,11 +429,11 @@
         <h1>Órgãos &amp; Participação</h1>
         <p class="view-intro">Os 18 órgãos e entidades formalmente designados pelo art. 5º, com a matriz de em quais Câmaras Técnicas cada um já foi mapeado como participante.</p>
       </div>
-      <div class="card">
+      <div class="card" id="orgCardArt5">
         <h3>Órgãos designados pelo art. 5º</h3>
         <div id="orgaosTableWrap"></div>
       </div>
-      <div class="card">
+      <div class="card" id="orgCardExtra">
         <h3>Parceiros técnicos / apoio identificados nas Câmaras (fora da lista do art. 5º)</h3>
         <div id="extraOrgTableWrap"></div>
         <div class="note"><b>Observação:</b> estes órgãos aparecem como participantes de eixos temáticos nas Câmaras Técnicas, mas não constam na lista de composição formal do art. 5º do Decreto. Pode ser um arranjo operacional normal (art. 4º, XI permite instituir câmaras e grupos de trabalho), mas vale confirmar se algum deles deveria estar formalizado.</div>
@@ -573,14 +660,18 @@ function renderStats(){
   const allParticipantes = new Set();
   camaras.forEach(c=>c.eixos.forEach(e=>e.participantes.forEach(p=>allParticipantes.add(p))));
   const stats = [
-    {label:'Órgãos designados (art. 5º)', value:'18'},
-    {label:'Câmaras Técnicas + Eixos Transversais', value:'5'},
-    {label:'Eixos temáticos mapeados', value:String(totalEixos)},
-    {label:'Órgãos únicos participando de eixos', value:String(allParticipantes.size)},
+    {label:'Órgãos designados (art. 5º)', value:'18', view:'orgaos', targets:['orgCardArt5']},
+    {label:'Câmaras Técnicas + Eixos Transversais', value:'5', view:'camaras', targets:[]},
+    {label:'Eixos temáticos mapeados', value:String(totalEixos), view:'camaras', targets:[]},
+    {label:'Órgãos únicos participando de eixos', value:String(allParticipantes.size), view:'orgaos', targets:['orgCardArt5','orgCardExtra']},
   ];
   const row = document.getElementById('statsRow');
   stats.forEach(s=>{
-    const tile = el('div','stat-tile', `<div class="label">${s.label}</div><div class="value">${s.value}</div>`);
+    const tile = el('button','stat-tile link',
+      `<div class="label">${s.label}</div><div class="value">${s.value}</div><span class="stat-goto">Ver detalhes →</span>`);
+    tile.setAttribute('type','button');
+    tile.setAttribute('aria-label', `Ir para ${s.label}`);
+    tile.onclick = ()=> goToStat(s.view, s.targets);
     row.appendChild(tile);
   });
 }
@@ -644,7 +735,11 @@ function renderDecreto(){
 function renderGovCamaras(){
   const row = document.getElementById('govCamarasRow');
   camaras.forEach(c=>{
-    const box = el('div','oc-box', `${c.numero} · ${c.titulo}<span class="oc-sub">${c.coord}</span>`);
+    const box = el('button','oc-box link',
+      `${c.numero} · ${c.titulo}<span class="oc-sub">${c.coord}</span><span class="oc-goto">Ver Câmara Técnica →</span>`);
+    box.setAttribute('type','button');
+    box.setAttribute('aria-label', `Ir para ${c.titulo} em Câmaras Técnicas`);
+    box.onclick = ()=> goToCamara(c.id);
     row.appendChild(box);
   });
 }
@@ -670,6 +765,7 @@ function renderCamaras(filter=''){
     anyResult = true;
 
     const card = el('div','camara-card');
+    card.id = 'camara-'+c.id;
     const head = el('div','camara-head', `
       <div class="tag">${c.numero}</div>
       <h3>${c.titulo}</h3>
@@ -765,13 +861,45 @@ function renderRoadmap(){
 /* ============================================================
    NAV / INIT
    ============================================================ */
-document.querySelectorAll('#mainnav button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('#mainnav button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+function showView(viewName){
+  document.querySelectorAll('#mainnav button').forEach(b=>b.classList.toggle('active', b.dataset.view===viewName));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+viewName).classList.add('active');
+}
+
+function goToCamara(camaraId){
+  const searchInput = document.getElementById('camaraSearch');
+  if(searchInput.value){ searchInput.value=''; renderCamaras(''); }
+  showView('camaras');
+  const target = document.getElementById('camara-'+camaraId);
+  if(!target) return;
+  requestAnimationFrame(()=>{
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+    target.classList.add('flash');
+    setTimeout(()=> target.classList.remove('flash'), 1900);
   });
+}
+
+function goToStat(view, targetIds=[]){
+  showView(view);
+  if(!targetIds || !targetIds.length){
+    requestAnimationFrame(()=> window.scrollTo({top:0, behavior:'smooth'}));
+    return;
+  }
+  requestAnimationFrame(()=>{
+    let first = true;
+    targetIds.forEach(id=>{
+      const target = document.getElementById(id);
+      if(!target) return;
+      if(first){ target.scrollIntoView({behavior:'smooth', block:'start'}); first=false; }
+      target.classList.add('flash');
+      setTimeout(()=> target.classList.remove('flash'), 1900);
+    });
+  });
+}
+
+document.querySelectorAll('#mainnav button').forEach(btn=>{
+  btn.addEventListener('click', ()=> showView(btn.dataset.view));
 });
 
 document.getElementById('camaraSearch').addEventListener('input', (e)=>renderCamaras(e.target.value));
