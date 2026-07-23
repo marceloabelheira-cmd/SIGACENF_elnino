@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiGACEnf · Comitê El Niño RJ</title>
+<style>
+  :root{
+    --surface-1:#fcfcfb; --surface-2:#ffffff; --page:#f9f9f7;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+    --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --series-1:#2a78d6; --series-1-soft:#cde2fb;
+    --series-2:#eb6834; --series-3:#1baf7a; --series-4:#eda100;
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+    --success-text:#006300;
+    color-scheme: light;
+  }
+  [data-theme="dark"]{
+    --surface-1:#1a1a19; --surface-2:#222221; --page:#0d0d0d;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-1-soft:#1c3a5c;
+    --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#e66767;
+    --success-text:#0ca30c;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:var(--page); color:var(--text-primary);
+  }
+  a{color:var(--series-1);}
+  .app{display:flex; min-height:100vh;}
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:250px; flex-shrink:0; background:var(--surface-2); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; padding:20px 14px; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand{padding:6px 10px 18px 10px;}
+  .brand .name{font-size:19px; font-weight:700; letter-spacing:-0.01em;}
+  .brand .sub{font-size:12px; color:var(--text-secondary); margin-top:2px; line-height:1.4;}
+  nav.mainnav{display:flex; flex-direction:column; gap:2px; margin-top:6px;}
+  nav.mainnav button{
+    all:unset; cursor:pointer; padding:10px 12px; border-radius:8px; font-size:14px;
+    color:var(--text-secondary); font-weight:500; display:flex; align-items:center; gap:10px;
+  }
+  nav.mainnav button:hover{background:var(--page); color:var(--text-primary);}
+  nav.mainnav button.active{background:var(--series-1-soft); color:var(--series-1); font-weight:600;}
+  .sidebar-foot{margin-top:auto; padding-top:16px; border-top:1px solid var(--border);}
+  .sidebar-foot .badge{
+    font-size:11px; color:var(--text-muted); line-height:1.5;
+  }
+  .theme-toggle{
+    all:unset; cursor:pointer; font-size:12px; color:var(--text-secondary);
+    border:1px solid var(--border); padding:6px 10px; border-radius:20px; margin-top:10px;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .theme-toggle:hover{background:var(--page);}
+  /* ---------- MAIN ---------- */
+  main{flex:1; padding:28px 36px 60px 36px; max-width:1180px;}
+  .view{display:none;}
+  .view.active{display:block;}
+  h1{font-size:24px; margin:0 0 4px 0; letter-spacing:-0.01em;}
+  h2{font-size:19px; margin:0 0 2px 0;}
+  .view-intro{color:var(--text-secondary); font-size:14px; margin:0 0 24px 0; max-width:760px; line-height:1.55;}
+  .card{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:12px;
+    padding:20px 22px; margin-bottom:18px;
+  }
+  .card h3{margin:0 0 12px 0; font-size:15px;}
+  .card h3 .n{color:var(--text-muted); font-weight:500; margin-right:6px;}
+  /* stat tiles */
+  .stats-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; margin-bottom:20px;}
+  .stat-tile{background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:16px 18px;}
+  .stat-tile .label{font-size:12.5px; color:var(--text-secondary); margin-bottom:6px;}
+  .stat-tile .value{font-size:30px; font-weight:600; letter-spacing:-0.02em;}
+  .stat-tile .value .unit{font-size:14px; color:var(--text-muted); font-weight:500; margin-left:4px;}
+  /* two-col layout */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:920px){ .grid2{grid-template-columns:1fr;} .app{flex-direction:column;} .sidebar{width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap;} nav.mainnav{flex-direction:row; flex-wrap:wrap;} main{padding:20px;} }
+  /* bar chart (single-series, horizontal) */
+  .barchart{display:flex; flex-direction:column; gap:9px; margin-top:6px;}
+  .barrow{display:grid; grid-template-columns:190px 1fr 34px; align-items:center; gap:10px;}
+  .barrow .rowlabel{font-size:12.5px; color:var(--text-secondary); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .barrow .track{background:var(--grid); border-radius:4px; height:18px; position:relative;}
+  .barrow .fill{
+    background:var(--series-1); height:18px; border-radius:4px; position:absolute; left:0; top:0;
+    transition:width .5s ease;
+  }
+  .barrow .val{font-size:12.5px; color:var(--text-secondary); font-variant-numeric:tabular-nums;}
+  details.tableview{margin-top:12px;}
+  details.tableview summary{cursor:pointer; font-size:12.5px; color:var(--series-1); font-weight:600; user-select:none;}
+  table.dtable{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;}
+  table.dtable th, table.dtable td{text-align:left; padding:7px 10px; border-bottom:1px solid var(--grid);}
+  table.dtable th{color:var(--text-muted); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em;}
+  table.dtable td.num{font-variant-numeric:tabular-nums; text-align:right;}
+  /* decree accordion */
+  .accordion-item{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; background:var(--surface-1);}
+  .accordion-head{
+    all:unset; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; width:100%; font-weight:600; font-size:14.5px;
+  }
+  .accordion-head .chev{color:var(--text-muted); font-size:12px; transition:transform .2s;}
+  .accordion-item.open .chev{transform:rotate(90deg);}
+  .accordion-body{display:none; padding:0 18px 18px 18px; font-size:14px; line-height:1.65; color:var(--text-secondary);}
+  .accordion-item.open .accordion-body{display:block;}
+  .accordion-body p{margin:0 0 10px 0;}
+  .accordion-body .art-tag{display:inline-block; font-size:11px; font-weight:700; color:var(--series-1); background:var(--series-1-soft); padding:2px 8px; border-radius:10px; margin-bottom:6px;}
+  .accordion-body ol{padding-left:20px; margin:8px 0;}
+  .accordion-body ol li{margin-bottom:8px;}
+  /* org chart */
+  .orgchart{display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 0 4px 0;}
+  .oc-box{border:1.5px solid var(--border); background:var(--surface-2); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:600; text-align:center; min-width:180px;}
+  .oc-box.accent{border-color:var(--series-1); color:var(--series-1); background:var(--series-1-soft);}
+  .oc-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .oc-connector{width:1.5px; height:18px; background:var(--baseline);}
+  .oc-sub{font-size:11px; font-weight:400; color:var(--text-secondary); display:block; margin-top:2px;}
+  .oc-tier-label{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin:2px 0;}
+  /* camaras cards */
+  .searchbar{margin-bottom:16px;}
+  .searchbar input{
+    width:100%; max-width:420px; padding:9px 14px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary); font-size:14px;
+  }
+  .camara-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-1); margin-bottom:16px; overflow:hidden;}
+  .camara-head{padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface-2);}
+  .camara-head .tag{font-size:11px; font-weight:700; color:var(--series-1);}
+  .camara-head h3{margin:2px 0 8px 0; font-size:16px;}
+  .camara-meta{display:flex; gap:22px; flex-wrap:wrap; font-size:12.5px; color:var(--text-secondary);}
+  .camara-meta b{color:var(--text-primary); font-weight:600;}
+  .eixo{padding:16px 20px; border-bottom:1px solid var(--grid);}
+  .eixo:last-child{border-bottom:none;}
+  .eixo-tema{font-size:14.5px; font-weight:700; margin-bottom:6px;}
+  .eixo-row{font-size:12.5px; color:var(--text-secondary); margin-bottom:6px; display:flex; gap:6px; flex-wrap:wrap; align-items:baseline;}
+  .eixo-row b{color:var(--text-primary); font-weight:600;}
+  .chips{display:flex; gap:6px; flex-wrap:wrap; margin:4px 0 8px 0;}
+  .chip{font-size:11.5px; background:var(--page); border:1px solid var(--border); color:var(--text-secondary); padding:2px 9px; border-radius:20px;}
+  .chip.coord{background:var(--series-1-soft); color:var(--series-1); border-color:transparent; font-weight:600;}
+  .eixo-assuntos{font-size:13px; color:var(--text-secondary); line-height:1.55;}
+  /* orgaos table */
+  .flag{font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px;}
+  .flag.ok{background:var(--series-1-soft); color:var(--series-1);}
+  .flag.warn{background:#fdecd2; color:#8a5a00;}
+  [data-theme="dark"] .flag.warn{background:#3a2f10; color:var(--warning);}
+  .note{
+    border-left:3px solid var(--series-4); background:var(--surface-1); border-radius:0 10px 10px 0;
+    padding:12px 16px; font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin:14px 0;
+  }
+  .note b{color:var(--text-primary);}
+  /* roadmap */
+  .module-list{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
+  .module{border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:var(--surface-1);}
+  .module .mnum{font-size:11px; font-weight:700; color:var(--series-1); margin-bottom:4px;}
+  .module h4{margin:0 0 6px 0; font-size:14.5px;}
+  .module p{margin:0; font-size:13px; color:var(--text-secondary); line-height:1.55;}
+  .module .reqs{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;}
+  .reqbadge{font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:8px;}
+  .reqbadge.backend{background:#fde3e3; color:#9c1f1f;}
+  [data-theme="dark"] .reqbadge.backend{background:#3d1c1c; color:var(--critical);}
+  .reqbadge.frontend{background:var(--series-1-soft); color:var(--series-1);}
+  footer.pagefoot{margin-top:30px; padding-top:16px; border-top:1px solid var(--border); font-size:11.5px; color:var(--text-muted);}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="name">SiGACEnf</div>
+      <div class="sub">Sistema de Gestão das Ações Coordenadas de Enfrentamento<br>Comitê El Niño · Estado do Rio de Janeiro</div>
+    </div>
+    <nav class="mainnav" id="mainnav">
+      <button data-view="visao-geral" class="active">Visão Geral</button>
+      <button data-view="decreto">O Decreto 50.357/2026</button>
+      <button data-view="governanca">Estrutura de Governança</button>
+      <button data-view="camaras">Câmaras Técnicas</button>
+      <button data-view="orgaos">Órgãos &amp; Participação</button>
+      <button data-view="roadmap">Roadmap do Sistema</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="badge">Base legal: Decreto Estadual nº 50.357, de 02/07/2026, e definições internas das Câmaras Técnicas.<br>Versão v0.1 · painel de consulta preliminar.</div>
+      <button class="theme-toggle" id="themeToggle">🌓 Alternar tema</button>
+    </div>
+  </aside>
+
+  <main id="mainviews">
+    <!-- ================= VISÃO GERAL ================= -->
+    <section class="view active" id="view-visao-geral">
+      <h1>Visão Geral</h1>
+      <p class="view-intro">O Comitê Estadual de Enfrentamento aos Efeitos do El Niño coordena ações de monitoramento, prevenção, mitigação, preparação e resposta aos impactos do fenômeno no Estado do Rio de Janeiro, como estrutura temática do SIEPDEC.</p>
+
+      <div class="stats-row" id="statsRow"></div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Eixos temáticos por Câmara Técnica</h3>
+          <div class="barchart" id="chartEixosPorCamara"></div>
+        </div>
+        <div class="card">
+          <h3>Órgãos mais recorrentes nas Câmaras Técnicas</h3>
+          <div class="barchart" id="chartOrgFreq"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Coordenação do Comitê</h3>
+        <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.65; margin:0;">
+        Coordenado pela <b style="color:var(--text-primary);">Secretaria de Estado de Defesa Civil (SEDEC)</b>, com assessoramento técnico e operacional da <b style="color:var(--text-primary);">Subsecretaria de Gestão Operacional (SUBSEGOP)</b>, responsável pela articulação interinstitucional, coordenação estratégica e monitoramento integrado das ações (art. 2º). O Comitê integra o SIEPDEC como organismo temático especializado, articulando-se com o CONEPDEC quanto às diretrizes gerais da Política Estadual de Proteção e Defesa Civil (art. 3º).
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= DECRETO ================= -->
+    <section class="view" id="view-decreto">
+      <h1>O Decreto 50.357/2026</h1>
+      <p class="view-intro">Texto-base extraído da planilha original, organizado por seção. Ainda não é o texto oficial integral do Decreto — ver observação no Roadmap sobre anexar o PDF/DOCX publicado.</p>
+      <div id="decretoAccordion"></div>
+    </section>
+
+    <!-- ================= GOVERNANÇA ================= -->
+    <section class="view" id="view-governanca">
+      <h1>Estrutura de Governança</h1>
+      <p class="view-intro">Como o Comitê El Niño se posiciona dentro do sistema estadual de proteção e defesa civil, e como se organiza internamente.</p>
+      <div class="card">
+        <h3>Posicionamento sistêmico (art. 3º)</h3>
+        <div class="orgchart">
+          <div class="oc-box">SIEPDEC<span class="oc-sub">Sistema Estadual de Proteção e Defesa Civil</span></div>
+          <div class="oc-connector"></div>
+          <div class="oc-row">
+            <div class="oc-box accent">Comitê El Niño<span class="oc-sub">organismo temático especializado</span></div>
+            <div class="oc-box">CONEPDEC<span class="oc-sub">diretrizes gerais da Política Estadual</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Coordenação e estrutura interna (arts. 2º, 8º a 12)</h3>
+        <div class="orgchart">
+          <div class="oc-row">
+            <div class="oc-box">SEDEC<span class="oc-sub">coordenação (art. 2º)</span></div>
+            <div class="oc-box">SUBSEGOP<span class="oc-sub">assessoramento técnico/operacional</span></div>
+          </div>
+          <div class="oc-connector"></div>
+          <div class="oc-box accent">Comitê El Niño</div>
+          <div class="oc-connector"></div>
+          <div class="oc-row">
+            <div class="oc-box">Sala de Situação do El Niño<span class="oc-sub">monitoramento contínuo (art. 8º)</span></div>
+            <div class="oc-box">NI²AD<span class="oc-sub">consolidação e inteligência (art. 10)</span></div>
+          </div>
+          <div class="oc-connector"></div>
+          <div class="oc-tier-label">Câmaras Técnicas &amp; Eixos Transversais (art. 4º, XI)</div>
+          <div class="oc-row" id="govCamarasRow"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CÂMARAS TÉCNICAS ================= -->
+    <section class="view" id="view-camaras">
+      <h1>Câmaras Técnicas</h1>
+      <p class="view-intro">4 Câmaras Técnicas temáticas + Eixos Transversais, com seus eixos, órgãos coordenadores/participantes e propostas de assuntos a tratar.</p>
+      <div class="searchbar"><input type="text" id="camaraSearch" placeholder="Buscar por câmara, eixo temático ou órgão…"></div>
+      <div id="camarasList"></div>
+    </section>
+
+    <!-- ================= ÓRGÃOS ================= -->
+    <section class="view" id="view-orgaos">
+      <h1>Órgãos &amp; Participação</h1>
+      <p class="view-intro">Os 18 órgãos e entidades formalmente designados pelo art. 5º, com a matriz de em quais Câmaras Técnicas cada um já foi mapeado como participante.</p>
+      <div class="card">
+        <h3>Órgãos designados pelo art. 5º</h3>
+        <div id="orgaosTableWrap"></div>
+      </div>
+      <div class="card">
+        <h3>Parceiros técnicos / apoio identificados nas Câmaras (fora da lista do art. 5º)</h3>
+        <div id="extraOrgTableWrap"></div>
+        <div class="note"><b>Observação:</b> estes órgãos aparecem como participantes de eixos temáticos nas Câmaras Técnicas, mas não constam na lista de composição formal do art. 5º do Decreto. Pode ser um arranjo operacional normal (art. 4º, XI permite instituir câmaras e grupos de trabalho), mas vale confirmar se algum deles deveria estar formalizado.</div>
+      </div>
+    </section>
+
+    <!-- ================= ROADMAP ================= -->
+    <section class="view" id="view-roadmap">
+      <h1>Roadmap do SiGACEnf</h1>
+      <p class="view-intro">Este painel (v0.1) organiza o conteúdo estático já levantado. A visão completa do SiGACEnf é ser o sistema de gestão de todas as ações coordenadas de enfrentamento — não só consulta, mas também <b>banco de dados</b> de recursos e ações.</p>
+
+      <div class="module-list" id="moduleList"></div>
+
+      <div class="card" style="margin-top:20px;">
+        <h3>Notas de qualidade de dados a validar (planilha preliminar)</h3>
+        <div id="dataNotes"></div>
+      </div>
+    </section>
+
+    <footer class="pagefoot">SiGACEnf v0.1 — painel gerado a partir da planilha "MATRIZ x R COMITÊ EL NIÑO". Conteúdo estático baseado no Decreto Estadual nº 50.357/2026 e em definições internas das Câmaras Técnicas fornecidas em 23/07/2026.</footer>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DADOS
+   ============================================================ */
+const orgaosArt5 = [
+  {n:'I',   sigla:'SEDEC',    nome:'Secretaria de Estado de Defesa Civil'},
+  {n:'II',  sigla:'CBMERJ',   nome:'Corpo de Bombeiros Militar do Estado do Rio de Janeiro'},
+  {n:'III', sigla:'SES',      nome:'Secretaria de Estado de Saúde'},
+  {n:'IV',  sigla:'SEAPPADI', nome:'Secretaria de Estado de Agricultura, Pecuária e Abastecimento'},
+  {n:'V',   sigla:'SEAS',     nome:'Secretaria de Estado do Ambiente e Sustentabilidade'},
+  {n:'VI',  sigla:'SEDSODH',  nome:'Secretaria de Estado de Desenvolvimento Social e Direitos Humanos'},
+  {n:'VII', sigla:'SEEDUC',   nome:'Secretaria de Estado de Educação'},
+  {n:'VIII',sigla:'—',        nome:'Secretaria de Estado de Segurança Pública'},
+  {n:'IX',  sigla:'Casa Civil', nome:'Secretaria de Estado da Casa Civil'},
+  {n:'X',   sigla:'SEGOV',    nome:'Secretaria de Estado de Governo'},
+  {n:'XI',  sigla:'SEENEMAR', nome:'Secretaria de Estado de Energia e Economia do Mar'},
+  {n:'XII', sigla:'—',        nome:'Secretaria de Estado de Desenvolvimento Econômico, Indústria, Comércio e Serviços'},
+  {n:'XIII',sigla:'DRM',      nome:'Departamento de Recursos Minerais'},
+  {n:'XIV', sigla:'INEA',     nome:'Instituto Estadual do Ambiente'},
+  {n:'XV',  sigla:'AGENERSA', nome:'Agência Estadual de Energia e Saneamento Básico'},
+  {n:'XVI', sigla:'SEIOP',    nome:'Secretaria de Estado de Infraestrutura e Obras Públicas'},
+  {n:'XVII',sigla:'—',        nome:'Secretaria de Estado de Ciência, Tecnologia e Inovação'},
+  {n:'XVIII',sigla:'SEPLAG',  nome:'Secretaria de Estado de Planejamento e Gestão'},
+];
+// aliases used inside CT sheets that refer to the same art.5 org
+const aliasMap = { 'SEAPPADI':'SEAPPADI', 'Casa Civil':'Casa Civil' };
+
+const camaras = [
+ { id:'ct1', numero:'I', titulo:'Câmara Técnica de Saúde e Proteção Social',
+   coord:'Secretaria Estadual de Saúde (SES)', adjunto:'Cel Simone Simões',
+   eixos:[
+    {tema:'Saúde Pública', of:'Cel Edna', orgCoord:'SES', participantes:['SES','SEDSODH','SEDEC'],
+     assuntos:'Orientações aos municípios sobre locais de hidratação pública; diagnóstico de doenças e causas de morte agravados pelo calor e baixa umidade; campanhas de prevenção e vigilância epidemiológica; orientação às populações.'},
+    {tema:'Bem-Estar Animal', of:'Ten Cel Carlos Cunha', orgCoord:'SUPAN (SES)', participantes:['SES','GRETA'],
+     assuntos:'Proteção e manejo de animais domésticos e de rua em exposição às ondas de calor e baixa umidade; pontos de hidratação animal; resgate e abrigamento; orientações às Secretarias municipais e às populações.'},
+    {tema:'Assistência Social e Proteção de Vulneráveis', of:'Ten Cel Cláudia Valentim', orgCoord:'SEDSODH', participantes:['SEDSODH','SES','SEDEC'],
+     assuntos:'Proteção de vulneráveis (crianças, gestantes, idosos, pessoas em situação de rua) durante ondas de calor.'},
+    {tema:'Unidade Escolar', of:'Ten Cel Kellen', orgCoord:'SEEDUC', participantes:['SEEDUC','SEDSODH','SEDEC'],
+     assuntos:'Melhoria da refrigeração das escolas; critérios para suspensão de educação física e aulas em dias críticos; aumento de bebedouros; escolas como locais de hidratação e abrigamento da população.'},
+   ]},
+ { id:'ct2', numero:'II', titulo:'Câmara Técnica de Agricultura, Pecuária e Segurança Alimentar',
+   coord:'Secretaria de Estado de Agricultura, Pecuária, Pesca, Abastecimento e Desenvolvimento do Interior (SEAPPADI)', adjunto:'Ten Cel Manoel Dias',
+   eixos:[
+    {tema:'Pecuária', of:'Maj Braga', orgCoord:'SEAPPADI', participantes:['SEAPPADI','EMATER-RIO','FIPERJ','SEDEC'],
+     assuntos:'Orientações aos municípios para mitigação da perda de criação animal; distribuição de água e alimentação animal emergencial.'},
+    {tema:'Agricultura e Agricultura Familiar', of:'Maj Braga', orgCoord:'SUPAN (SES)', participantes:['SEAPPADI','EMATER-RIO','SEDEC'],
+     assuntos:'Orientações aos municípios para mitigação da perda das culturas; crédito emergencial e seguro rural.'},
+    {tema:'Pesca e Aquicultura', of:'Maj Braga', orgCoord:'SEDSODH', participantes:['FIPERJ','SEAPPADI','INEA','SEDEC'],
+     assuntos:"Monitoramento de corpos d'água para atividade pesqueira; apoio emergencial a pescadores artesanais."},
+   ]},
+ { id:'ct3', numero:'III', titulo:'Câmara Técnica de Incêndios Florestais e Proteção Ambiental',
+   coord:'SEDEC/CBMERJ', adjunto:'Ten Cel Fábio Gonçalves',
+   eixos:[
+    {tema:'Supressão de Incêndios Florestais', of:'Ten Cel Dias', orgCoord:'CBMERJ', participantes:['CBMERJ','INEA','NSAO (FE-SEDEC)','SEAS','SEDEC'],
+     assuntos:'Orientações aos municípios quanto à mitigação dos fogos em vegetação; implantação do Programa Fumaça Zero nos municípios; plano operacional integrado.'},
+    {tema:'Proteção Ambiental em Áreas de Reserva', of:'Ten Cel Diogo Rocha', orgCoord:'INEA', participantes:['INEA','CBMERJ','SEAPPADI','SEAS','SEDEC'],
+     assuntos:'Monitoramento e combate a incêndios em unidades de conservação; proteção da fauna em áreas protegidas.'},
+    {tema:'Proteção Ambiental no Meio Rural', of:'Ten Cel Braga', orgCoord:'SEAPPADI', participantes:['SEAPPADI','CBMERJ','INEA','EMATER-RIO','SEDEC'],
+     assuntos:'Aceiros e manejo integrado do fogo em propriedades rurais; orientação a pequenos produtores.'},
+   ]},
+ { id:'ct4', numero:'IV', titulo:'Câmara Técnica de Infraestrutura, Energia e Recursos Hídricos',
+   coord:'Secretaria Estadual do Ambiente e Sustentabilidade (SEAS)', adjunto:'Cel Marcio Neves',
+   eixos:[
+    {tema:'Segurança Energética', of:'Ten Cel Mouta', orgCoord:'CGREE (SEENEMAR)', participantes:['SEENEMAR','AGENERSA','SEDEC'],
+     assuntos:'Monitoramento da demanda e oferta de energia; riscos de colapso no sistema; planos de emergência para suprimento energético.'},
+    {tema:'Recursos Hídricos e Saneamento', of:'Ten Cel Freire', orgCoord:'INEA', participantes:['INEA','AGENERSA','concessionária','SEIOP','SEDEC'],
+     assuntos:"Monitoramento de reservatórios e mananciais; racionamento emergencial; planos de contingência para abastecimento de água (escassez hídrica); apoio a municípios em colapso hídrico."},
+   ]},
+ { id:'transv', numero:'V', titulo:'Eixos Temáticos Transversais',
+   coord:'Secretaria-Executiva/SUBSEGOP', adjunto:'Cel Ana Martinez',
+   eixos:[
+    {tema:'Comunicação Social e Alerta à População', of:'Ten Cel Diogo Rocha', orgCoord:'SEGOV', participantes:['SEGOV','Assejur (SEDEC)','SES','INEA','SEAPPADI','SEEDUC','Casa Civil'],
+     assuntos:'Campanhas educativas; alertas à população; combate à desinformação.'},
+    {tema:'Captação de Recursos e Articulação Federativa', of:'Ten Cel Adriana B.', orgCoord:'SEFAZ / SEPLAG', participantes:['SEFAZ','SEPLAG','Casa Civil','SEDEC'],
+     assuntos:'Captação de recursos federais (MDR, MDA, MMA); articulação com Parlamento e ministérios.'},
+   ]},
+];
+
+const decreto = [
+ {tag:'Arts. 1º–3º', titulo:'Disposições Gerais', body:`
+  <span class="art-tag">art. 1º</span><p>Fica instituído o Comitê Estadual de Enfrentamento aos Efeitos do El Niño - COMITÊ EL NIÑO, de caráter consultivo, preventivo, estratégico e intersetorial, como estrutura temática especializada do Sistema Estadual de Proteção e Defesa Civil - SIEPDEC, com a finalidade de coordenar ações integradas de monitoramento, prevenção, mitigação, preparação e resposta aos impactos decorrentes do fenômeno climático no território do Estado do Rio de Janeiro.</p>
+  <span class="art-tag">art. 2º</span><p>O Comitê El Niño será coordenado pela Secretaria de Estado de Defesa Civil - SEDEC, com assessoramento técnico e operacional da Subsecretaria de Gestão Operacional - SUBSEGOP, responsável pela articulação interinstitucional, coordenação estratégica e monitoramento integrado das ações.<br><i>Parágrafo único:</i> A coordenação do Comitê pela SEDEC fundamenta-se na sua competência legal e institucional na gestão de riscos e desastres, conforme o §5º do art. 144 da Constituição Federal, o art. 7º da Lei Federal nº 12.608/2012 e o art. 5º do Decreto Estadual nº 46.935/2020.</p>
+  <span class="art-tag">art. 3º</span><p>Para fins de posicionamento sistêmico, o Comitê El Niño integra a estrutura do SIEPDEC como organismo temático especializado, articulando-se com o Conselho Estadual de Proteção e Defesa Civil - CONEPDEC no que se refere às diretrizes gerais da Política Estadual de Proteção e Defesa Civil.</p>
+ `},
+ {tag:'Art. 4º', titulo:'Competências do Comitê', body:`
+  <span class="art-tag">art. 4º</span><p>Compete ao Comitê El Niño:</p>
+  <ol>
+   <li>coordenar ações integradas de monitoramento, prevenção, mitigação, preparação e resposta relacionadas aos efeitos do fenômeno El Niño;</li>
+   <li>promover a articulação entre os órgãos estaduais, municípios, concessionárias de serviços públicos, órgãos federais e demais instituições estratégicas;</li>
+   <li>monitorar cenários críticos relacionados à estiagem, ondas de calor, baixa umidade relativa do ar, incêndios florestais e impactos à saúde pública;</li>
+   <li>propor protocolos operacionais integrados e medidas preventivas;</li>
+   <li>promover o compartilhamento de informações estratégicas entre os órgãos participantes;</li>
+   <li>apoiar ações voltadas à proteção da população vulnerável, incluindo crianças, idosos e pessoas em situação de risco social;</li>
+   <li>apoiar ações voltadas à proteção econômica da população rural e de pequenos produtores em situação de vulnerabilidade;</li>
+   <li>fortalecer as ações de prevenção e combate aos incêndios florestais;</li>
+   <li>promover ações voltadas à mitigação dos impactos sobre a agropecuária, os recursos hídricos e a infraestrutura essencial;</li>
+   <li>emitir recomendações técnicas e estratégicas aos órgãos envolvidos;</li>
+   <li>instituir câmaras técnicas temáticas e grupos de trabalho;</li>
+   <li>promover a integração e o compartilhamento de dados estratégicos entre os órgãos participantes, visando à construção de painéis gerenciais, sistemas de monitoramento e produtos de inteligência para apoio à tomada de decisão.</li>
+  </ol>
+ `},
+ {tag:'Art. 5º', titulo:'Órgãos Envolvidos', body:`
+  <span class="art-tag">art. 5º</span><p>O Comitê El Niño será composto por representantes titulares e respectivos suplentes de 18 órgãos e entidades estaduais. Ver a lista completa e a matriz de participação na aba <b>Órgãos &amp; Participação</b>.</p>
+ `},
+ {tag:'Arts. 8º–12', titulo:'Sala de Situação do El Niño', body:`
+  <span class="art-tag">art. 8º</span><p>Fica instituída a Sala de Situação do El Niño, vinculada à SEDEC, destinada ao monitoramento contínuo dos cenários climáticos, ambientais, hidrológicos e operacionais relacionados aos impactos do fenômeno no território fluminense.</p>
+  <span class="art-tag">art. 9º</span><p>Compete à Sala de Situação:</p>
+  <ol>
+   <li>acompanhar a evolução dos indicadores climáticos, meteorológicos, hidrológicos, ambientais e operacionais relacionados ao fenômeno;</li>
+   <li>monitorar cenários críticos e áreas vulneráveis;</li>
+   <li>subsidiar a tomada de decisão governamental;</li>
+   <li>apoiar as ações de prevenção, mitigação, preparação e resposta;</li>
+   <li>promover o compartilhamento de informações entre órgãos e entidades participantes;</li>
+   <li>produzir análises integradas e cenários prospectivos;</li>
+   <li>elaborar boletins técnicos, relatórios situacionais e demais produtos de monitoramento.</li>
+  </ol>
+  <span class="art-tag">art. 10</span><p>As informações produzidas e compartilhadas pelos órgãos integrantes do Comitê serão consolidadas, processadas e analisadas pelo Núcleo Interinstitucional de Inteligência para Apoio à Decisão - NI²AD, da Força Especializada da SEDEC, com a finalidade de subsidiar o monitoramento situacional, a produção de conhecimento estratégico e a tomada de decisão governamental.</p>
+  <span class="art-tag">art. 11</span><p>Os órgãos e entidades integrantes do Comitê deverão disponibilizar à Sala de Situação as informações necessárias ao monitoramento dos impactos do fenômeno, observados a periodicidade, os formatos e os procedimentos definidos pela SEDEC.<br><i>Parágrafo único:</i> As concessionárias responsáveis pela administração e exploração de rodovias federais e estaduais no território fluminense deverão comunicar à Sala de Situação as ocorrências de princípios de incêndio e as ações de combate realizadas nas respectivas faixas de domínio.</p>
+  <span class="art-tag">art. 12</span><p>A SEDEC regulamentará, por resolução própria, a organização interna, o funcionamento, os fluxos de informação, os produtos de monitoramento, os eixos temáticos e os procedimentos operacionais da Sala de Situação.</p>
+ `},
+ {tag:'Arts. 13–17', titulo:'Disposições Finais', body:`
+  <span class="art-tag">art. 13</span><p>A participação no Comitê El Niño e nas Câmaras Técnicas será considerada prestação de serviço público relevante, não remunerada.</p>
+  <span class="art-tag">art. 14</span><p>O Comitê será convocado ordinariamente pela sua coordenação e poderá ser convocado extraordinariamente sempre que os indicadores meteorológicos, climáticos, hidrológicos, ambientais ou operacionais apontarem risco elevado de impactos associados ao fenômeno.</p>
+  <span class="art-tag">art. 15</span><p>O Comitê terá vigência enquanto perdurar o monitoramento ativo do fenômeno, podendo ser prorrogado, com ou sem alteração de composição e competências, por ato do Governador do Estado.</p>
+  <span class="art-tag">art. 16</span><p>A SEDEC poderá expedir normas complementares necessárias à execução deste Decreto.</p>
+  <span class="art-tag">art. 17</span><p>As despesas decorrentes da execução deste Decreto correrão por conta das dotações orçamentárias próprias dos órgãos e entidades envolvidos, não implicando criação de despesa adicional, podendo as dotações existentes ser suplementadas, quando necessário, na forma da legislação vigente.</p>
+ `},
+];
+
+const modules = [
+ {n:'01', title:'Módulo de Legislação', reqs:['frontend'],
+  desc:'Textos estáticos: decreto na íntegra, resoluções complementares da Sala de Situação (art. 12), atos de prorrogação (art. 15) e normas correlatas. Já iniciado neste v0.1.'},
+ {n:'02', title:'Módulo de Reuniões', reqs:['backend'],
+  desc:'Atas e relatórios de reunião por Câmara Técnica/eixo: pauta, presentes, encaminhamentos e prazos — informação dinâmica atualizada ao longo do tempo.'},
+ {n:'03', title:'Módulo de Recursos', reqs:['backend'],
+  desc:'Banco de dados de recursos humanos e materiais disponíveis por órgão, câmara técnica e eixo temático (equipes, viaturas, insumos, capacidade de resposta).'},
+ {n:'04', title:'Módulo de Ações', reqs:['backend'],
+  desc:'Registro de ações realizadas — com destaque para as preventivas — com status, responsável, câmara/eixo vinculado, data e evidências.'},
+ {n:'05', title:'Painéis de Inteligência', reqs:['backend','frontend'],
+  desc:'Integração com a Sala de Situação/NI²AD: painéis gerenciais e produtos de monitoramento para apoio à tomada de decisão (art. 4º, XII).'},
+];
+
+const dataNotes = [
+ 'CT2 (Agricultura): nos eixos "Agricultura e Agricultura Familiar" e "Pesca e Aquicultura", o campo "Órgão Coordenador" aparece como "SUPAN (SES)" e "SEDSODH" — nomes que se repetem de CT1 e parecem inconsistentes com o tema da câmara. Vale confirmar se é erro de preenchimento/cópia na planilha original.',
+ 'O nome da SEAPPADI no art. 5º ("Agricultura, Pecuária e Abastecimento") é mais curto do que o nome usado nas Câmaras Técnicas ("Agricultura, Pecuária, Pesca, Abastecimento e Desenvolvimento do Interior") — provavelmente a mesma secretaria, mas com denominações desatualizadas em uma das fontes.',
+ '4 órgãos do art. 5º ainda não aparecem em nenhum eixo temático das Câmaras Técnicas: Secretaria de Estado de Segurança Pública, Secretaria de Estado de Desenvolvimento Econômico/Indústria/Comércio/Serviços, Departamento de Recursos Minerais e Secretaria de Estado de Ciência, Tecnologia e Inovação.',
+ '7 órgãos aparecem como participantes de eixos temáticos mas não constam na lista oficial do art. 5º: EMATER-RIO, FIPERJ, GRETA, NSAO (FE-SEDEC), concessionária (rodovias), Assejur (SEDEC) e SEFAZ.',
+ 'Siglas não informadas na planilha para os órgãos VIII, XII e XVII do art. 5º — mantidas com "—" para não inventar abreviação.',
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+
+function orgFullName(sigla){
+  const hit = orgaosArt5.find(o=>o.sigla===sigla);
+  return hit? hit.nome : null;
+}
+
+/* ---- stat tiles ---- */
+function renderStats(){
+  const totalEixos = camaras.reduce((s,c)=>s+c.eixos.length,0);
+  const allParticipantes = new Set();
+  camaras.forEach(c=>c.eixos.forEach(e=>e.participantes.forEach(p=>allParticipantes.add(p))));
+  const stats = [
+    {label:'Órgãos designados (art. 5º)', value:'18'},
+    {label:'Câmaras Técnicas + Eixos Transversais', value:'5'},
+    {label:'Eixos temáticos mapeados', value:String(totalEixos)},
+    {label:'Órgãos únicos participando de eixos', value:String(allParticipantes.size)},
+  ];
+  const row = document.getElementById('statsRow');
+  stats.forEach(s=>{
+    const tile = el('div','stat-tile', `<div class="label">${s.label}</div><div class="value">${s.value}</div>`);
+    row.appendChild(tile);
+  });
+}
+
+/* ---- bar chart builder (single-series horizontal) ---- */
+function buildBarChart(container, rows, opts={}){
+  container.innerHTML='';
+  const max = Math.max(...rows.map(r=>r.value));
+  rows.forEach(r=>{
+    const pct = (r.value/max*100).toFixed(1);
+    const row = el('div','barrow');
+    row.innerHTML = `
+      <div class="rowlabel" title="${r.label}">${r.label}</div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="val">${r.value}</div>`;
+    container.appendChild(row);
+  });
+  if(opts.tableCaption){
+    const details = el('details','tableview');
+    const summary = el('summary', null, 'Ver dados em tabela');
+    details.appendChild(summary);
+    const table = el('table','dtable');
+    table.innerHTML = `<thead><tr><th>${opts.tableCaption[0]}</th><th>${opts.tableCaption[1]}</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r.label}</td><td class="num">${r.value}</td></tr>`).join('')}</tbody>`;
+    details.appendChild(table);
+    container.appendChild(details);
+  }
+}
+
+function renderCharts(){
+  const eixosPorCamara = camaras.map(c=>({label:`${c.numero} · ${c.titulo}`, value:c.eixos.length}));
+  buildBarChart(document.getElementById('chartEixosPorCamara'), eixosPorCamara, {tableCaption:['Câmara Técnica','Eixos']});
+
+  const freq = {};
+  camaras.forEach(c=>c.eixos.forEach(e=>e.participantes.forEach(p=>{ freq[p]=(freq[p]||0)+1; })));
+  const freqRows = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([label,value])=>({label,value}));
+  buildBarChart(document.getElementById('chartOrgFreq'), freqRows, {tableCaption:['Órgão','Nº de eixos']});
+}
+
+/* ---- decreto accordion ---- */
+function renderDecreto(){
+  const wrap = document.getElementById('decretoAccordion');
+  decreto.forEach((sec,i)=>{
+    const item = el('div','accordion-item'+(i===0?' open':''));
+    const head = el('button','accordion-head');
+    head.innerHTML = `<span>${sec.tag} — ${sec.titulo}</span><span class="chev">▶</span>`;
+    head.onclick = ()=> item.classList.toggle('open');
+    const body = el('div','accordion-body', sec.body);
+    item.appendChild(head); item.appendChild(body);
+    wrap.appendChild(item);
+  });
+}
+
+/* ---- governança camaras row ---- */
+function renderGovCamaras(){
+  const row = document.getElementById('govCamarasRow');
+  camaras.forEach(c=>{
+    const box = el('div','oc-box', `${c.numero} · ${c.titulo}<span class="oc-sub">${c.coord}</span>`);
+    row.appendChild(box);
+  });
+}
+
+/* ---- câmaras técnicas view ---- */
+function renderCamaras(filter=''){
+  const wrap = document.getElementById('camarasList');
+  wrap.innerHTML='';
+  const f = filter.trim().toLowerCase();
+  camaras.forEach(c=>{
+    const matchesCamara = c.titulo.toLowerCase().includes(f) || c.coord.toLowerCase().includes(f);
+    const visibleEixos = c.eixos.filter(e=>{
+      if(!f) return true;
+      const hay = (e.tema+' '+e.orgCoord+' '+e.participantes.join(' ')+' '+e.assuntos).toLowerCase();
+      return hay.includes(f);
+    });
+    if(f && !matchesCamara && visibleEixos.length===0) return;
+    const eixosToShow = f && !matchesCamara ? visibleEixos : c.eixos;
+
+    const card = el('div','camara-card');
+    const head = el('div','camara-head', `
+      <div class="tag">${c.numero}</div>
+      <h3>${c.titulo}</h3>
+      <div class="camara-meta">
+        <span><b>Secretaria Coordenadora:</b> ${c.coord}</span>
+        <span><b>Coordenador(a) Adjunto:</b> ${c.adjunto}</span>
+        <span><b>Eixos:</b> ${c.eixos.length}</span>
+      </div>`);
+    card.appendChild(head);
+    eixosToShow.forEach(e=>{
+      const eixoEl = el('div','eixo');
+      eixoEl.innerHTML = `
+        <div class="eixo-tema">${e.tema}</div>
+        <div class="eixo-row"><b>Of. de ligação:</b> ${e.of} &nbsp;·&nbsp; <b>Órgão coordenador:</b> ${e.orgCoord}</div>
+        <div class="chips">${e.participantes.map(p=>`<span class="chip${p===e.orgCoord?' coord':''}">${p}</span>`).join('')}</div>
+        <div class="eixo-assuntos">${e.assuntos}</div>`;
+      card.appendChild(eixoEl);
+    });
+    wrap.appendChild(card);
+  });
+  if(wrap.children.length===0){
+    wrap.appendChild(el('div','card', '<p style="color:var(--text-secondary); margin:0;">Nenhum resultado para essa busca.</p>'));
+  }
+}
+
+/* ---- órgãos view ---- */
+function renderOrgaos(){
+  // which official orgs participate in which camaras
+  const participation = {}; // sigla -> Set(camara numero)
+  const extraOrgs = {}; // sigla not in art5 -> Set(camara numero + eixo tema)
+  const officialSiglas = new Set(orgaosArt5.map(o=>o.sigla));
+  camaras.forEach(c=>{
+    c.eixos.forEach(e=>{
+      e.participantes.forEach(p=>{
+        if(officialSiglas.has(p)){
+          if(!participation[p]) participation[p]=new Set();
+          participation[p].add(c.numero);
+        } else {
+          if(!extraOrgs[p]) extraOrgs[p]=[];
+          extraOrgs[p].push(`${c.numero} · ${e.tema}`);
+        }
+      });
+    });
+  });
+
+  const tableWrap = document.getElementById('orgaosTableWrap');
+  const table = el('table','dtable');
+  table.innerHTML = `<thead><tr><th>Nº</th><th>Sigla</th><th>Órgão</th><th>Câmaras Técnicas em que participa</th></tr></thead>
+   <tbody>${orgaosArt5.map(o=>{
+     const camarasSet = participation[o.sigla];
+     const cell = camarasSet ? Array.from(camarasSet).sort().map(n=>`<span class="chip coord">${n}</span>`).join(' ')
+       : '<span class="flag warn">não mapeado ainda</span>';
+     return `<tr><td>${o.n}</td><td><b>${o.sigla}</b></td><td>${o.nome}</td><td>${cell}</td></tr>`;
+   }).join('')}</tbody>`;
+  tableWrap.appendChild(table);
+
+  const extraWrap = document.getElementById('extraOrgTableWrap');
+  const extraTable = el('table','dtable');
+  extraTable.innerHTML = `<thead><tr><th>Órgão / entidade</th><th>Aparece em</th></tr></thead>
+   <tbody>${Object.entries(extraOrgs).sort((a,b)=>b[1].length-a[1].length).map(([sigla,list])=>
+     `<tr><td><b>${sigla}</b></td><td>${list.map(x=>`<span class="chip">${x}</span>`).join(' ')}</td></tr>`
+   ).join('')}</tbody>`;
+  extraWrap.appendChild(extraTable);
+}
+
+/* ---- roadmap view ---- */
+function renderRoadmap(){
+  const wrap = document.getElementById('moduleList');
+  modules.forEach(m=>{
+    const box = el('div','module');
+    box.innerHTML = `<div class="mnum">MÓDULO ${m.n}</div><h4>${m.title}</h4><p>${m.desc}</p>
+      <div class="reqs">${m.reqs.map(r=>`<span class="reqbadge ${r}">${r==='backend'?'requer backend/BD':'somente front-end'}</span>`).join('')}</div>`;
+    wrap.appendChild(box);
+  });
+  const notesWrap = document.getElementById('dataNotes');
+  dataNotes.forEach(n=>{
+    notesWrap.appendChild(el('div','note', n));
+  });
+}
+
+/* ============================================================
+   NAV / INIT
+   ============================================================ */
+document.querySelectorAll('#mainnav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#mainnav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+document.getElementById('camaraSearch').addEventListener('input', (e)=>renderCamaras(e.target.value));
+
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', ()=>{
+  const html = document.documentElement;
+  const cur = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', cur==='dark' ? 'light' : 'dark');
+});
+// respect OS preference initially
+if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.documentElement.setAttribute('data-theme','dark');
+} else {
+  document.documentElement.setAttribute('data-theme','light');
+}
+
+renderStats();
+renderCharts();
+renderDecreto();
+renderGovCamaras();
+renderCamaras();
+renderOrgaos();
+renderRoadmap();
+</script>
+</body>
+</html>
