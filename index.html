@@ -215,6 +215,43 @@
     transition:border-color .12s, box-shadow .12s;
   }
   .searchbar input:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft);}
+  .searchbar-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px;}
+  .searchbar-row .searchbar{margin-bottom:0; flex:1; min-width:220px;}
+  .matrix-link-btn{
+    all:unset; cursor:pointer; font-size:13px; font-weight:700; padding:9px 16px; border-radius:8px;
+    border:1px solid var(--border); color:var(--brand); background:var(--brand-soft);
+    transition:border-color .12s, box-shadow .12s; white-space:nowrap; flex-shrink:0;
+  }
+  .matrix-link-btn:hover{border-color:var(--brand); box-shadow:var(--shadow-1);}
+  #view-transversais .matrix-link-btn, #view-orgaos .matrix-link-btn{margin-bottom:18px;}
+  /* matriz AxR */
+  .axr-legend{display:flex; gap:18px; flex-wrap:wrap; margin:4px 0 20px 0; padding:14px 18px; background:var(--surface-1); border:1px solid var(--border); border-radius:10px;}
+  .axr-legend-item{display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--text-secondary);}
+  .axr-legend .axr-badge{margin:0;}
+  .axr-wrap{overflow:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface-1); box-shadow:var(--shadow-1); max-height:70vh;}
+  table.axr-table{border-collapse:separate; border-spacing:0; font-size:12px; white-space:nowrap;}
+  .axr-table th, .axr-table td{padding:7px 8px; border-bottom:1px solid var(--grid); border-right:1px solid var(--grid); text-align:center; vertical-align:middle;}
+  .axr-table thead th{
+    position:sticky; top:0; z-index:2; background:var(--surface-2); color:var(--text-secondary); font-weight:700;
+    font-size:10.5px; white-space:normal; max-width:74px; line-height:1.25; padding:8px 6px; vertical-align:bottom;
+  }
+  .axr-table thead th.axr-corner{left:0; z-index:3; background:var(--surface-2);}
+  .axr-table td.axr-rowhead, .axr-table th.axr-rowhead{
+    position:sticky; left:0; z-index:1; background:var(--surface-1); text-align:left; white-space:normal;
+    min-width:230px; max-width:280px; font-weight:600; box-shadow:1px 0 0 var(--grid);
+  }
+  .axr-ct-row td.axr-rowhead{background:var(--surface-2); font-weight:800; color:var(--brand); text-transform:uppercase; font-size:11px; letter-spacing:.02em;}
+  .axr-ct-row td{background:var(--surface-2);}
+  .axr-eixo-row td.axr-rowhead{padding-left:22px; font-weight:500; color:var(--text-primary);}
+  .axr-badge{
+    display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:22px; padding:0 6px;
+    border-radius:6px; font-size:10.5px; font-weight:800; letter-spacing:.02em;
+  }
+  .axr-badge.rp{background:var(--brand); color:#fff;}
+  .axr-badge.r{background:var(--brand-soft); color:var(--brand);}
+  .axr-badge.p{background:transparent; color:var(--text-muted); border:1px solid var(--border); font-weight:700;}
+  .axr-section-gap{margin-top:32px;}
+  .axr-note{font-size:12.5px; color:var(--text-muted); margin:8px 0 16px 0; font-style:italic;}
   .camara-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-1); margin-bottom:16px; overflow:hidden; box-shadow:var(--shadow-1);}
   .camara-head{padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); border-top:3px solid var(--brand);}
   .camara-head .tag{font-size:11px; font-weight:700; color:var(--brand); letter-spacing:.04em; text-transform:uppercase;}
@@ -500,7 +537,10 @@
         <h1>Câmaras Técnicas</h1>
         <p class="view-intro">4 Câmaras Técnicas temáticas, com seus eixos, órgãos coordenadores/participantes e propostas de assuntos a tratar.</p>
       </div>
-      <div class="searchbar"><input type="text" id="camaraSearch" placeholder="Buscar por câmara, eixo temático ou órgão…"></div>
+      <div class="searchbar-row">
+        <div class="searchbar"><input type="text" id="camaraSearch" placeholder="Buscar por câmara, eixo temático ou órgão…"></div>
+        <button type="button" class="matrix-link-btn" onclick="showView('matrizaxr')">▦ Ver em formato de Matriz AxR</button>
+      </div>
       <div id="camarasList"></div>
     </section>
 
@@ -511,6 +551,7 @@
         <h1>Eixos Transversais</h1>
         <p class="view-intro">Eixos temáticos transversais às Câmaras Técnicas, sob coordenação da Secretaria-Executiva/SUBSEGOP, com seus órgãos coordenadores/participantes e propostas de assuntos a tratar.</p>
       </div>
+      <button type="button" class="matrix-link-btn" onclick="showView('matrizaxr')">▦ Ver em formato de Matriz AxR</button>
       <div id="transversaisList"></div>
     </section>
 
@@ -520,6 +561,7 @@
         <div class="eyebrow">Mapeamento de órgãos</div>
         <h1>Órgãos &amp; Participação</h1>
         <p class="view-intro">Os 18 órgãos e entidades formalmente designados pelo art. 5º, com a matriz de em quais Câmaras Técnicas cada um já foi mapeado como participante.</p>
+        <button type="button" class="matrix-link-btn" onclick="showView('matrizaxr')">▦ Ver em formato de Matriz AxR</button>
       </div>
       <div class="card" id="orgCardArt5">
         <h3>Órgãos designados pelo art. 5º</h3>
@@ -530,6 +572,28 @@
         <div id="extraOrgTableWrap"></div>
         <div class="note"><b>Observação:</b> estes órgãos aparecem como participantes de eixos temáticos nas Câmaras Técnicas, mas não constam na lista de composição formal do art. 5º do Decreto. Pode ser um arranjo operacional normal (art. 4º, XI permite instituir câmaras e grupos de trabalho), mas vale confirmar se algum deles deveria estar formalizado.</div>
       </div>
+    </section>
+
+    <!-- ================= MATRIZ AxR ================= -->
+    <section class="view" id="view-matrizaxr">
+      <div class="view-header">
+        <button class="back-link" type="button" onclick="showView(previousView)">← Voltar</button>
+        <div class="eyebrow">Visualização ilustrativa</div>
+        <h1>Matriz AxR — Atividades x Responsabilidades</h1>
+        <p class="view-intro">Mesma relação entre Câmaras Técnicas/Eixos e órgãos envolvidos já apresentada nas telas de Câmaras Técnicas e Órgãos &amp; Participação, só que num formato de matriz — mais visual para enxergar de uma vez quem coordena e quem participa de cada frente.</p>
+      </div>
+      <div class="axr-legend">
+        <div class="axr-legend-item"><span class="axr-badge rp">RP</span> Responsável Principal — coordenador(a) da Câmara Técnica</div>
+        <div class="axr-legend-item"><span class="axr-badge r">R</span> Responsável — coordenador(a) do Eixo Temático</div>
+        <div class="axr-legend-item"><span class="axr-badge p">P</span> Participante do Eixo Temático</div>
+      </div>
+      <div class="axr-wrap"><table class="axr-table" id="axrTable"></table></div>
+
+      <div class="axr-section-gap">
+        <h3 style="margin:0 0 4px 0;">Eixos Transversais</h3>
+        <p class="axr-note">Quadro equivalente, elaborado a partir dos dados já cadastrados no Sistema (mesma lógica R/P) — os Eixos Transversais não constam na planilha oficial Matriz AxR, que cobre apenas as 4 Câmaras Técnicas.</p>
+      </div>
+      <div class="axr-wrap"><table class="axr-table" id="axrTransversaisTable"></table></div>
     </section>
 
     <!-- ================= ROADMAP ================= -->
@@ -686,6 +750,55 @@ const eixosTransversais = {
 // Combined set used for cross-cutting analyses (Órgãos & Participação, frequency chart)
 // so organizational participation stays accurate even though Eixos Transversais has its own view.
 const camarasAll = camaras.concat([eixosTransversais]);
+
+/* ---- Matriz AxR (Atividades x Responsabilidades) — fonte: planilha MATRIZ_AxR ---- */
+const axrOrgs = ["SEDEC", "CBMERJ", "SES", "SUPAN (SES)", "SEDSODH", "SEEDUC", "GRETA", "SEAPPADI", "FIPERJ", "EMATER-RIO", "SEAS", "INEA", "NSAO (FE-SEDEC)", "CGREE (SEENEMAR)", "AGENERSA", "concessionária", "SEIOP"];
+const axrCamaras = [
+ {
+   titulo:"Câmara Técnica de Saúde e Proteção Social",
+   head:[null,null,"RP",null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+   eixos:[
+    {tema:"SAÚDE PÚBLICA", row:["P",null,"R",null,"P",null,null,null,null,null,null,null,null,null,null,null,null]},
+    {tema:"BEM ESTAR ANIMAL", row:[null,null,null,"R",null,null,"P",null,null,null,null,null,null,null,null,null,null]},
+    {tema:"ASSISTÊNCIA SOCIAL E PROTEÇÃO DOS VULNERÁVEIS", row:["P",null,"P",null,"R",null,null,null,null,null,null,null,null,null,null,null,null]},
+    {tema:"UNIDADE ESCOLAR", row:[null,null,null,null,null,"R",null,null,null,null,null,null,null,null,null,null,null]},
+   ]
+ },
+ {
+   titulo:"Câmara Técnica de Agricultura, Pecuária e Segurança Alimentar",
+   head:[null,null,null,null,null,null,null,"RP",null,null,null,null,null,null,null,null,null],
+   eixos:[
+    {tema:"PECUÁRIA", row:["P",null,null,null,null,null,null,"R","P","P",null,null,null,null,null,null,null]},
+    {tema:"AGRICULTURA E AGRICULTURA FAMILIAR", row:["P",null,null,"R",null,null,null,"P",null,"P",null,null,null,null,null,null,null]},
+    {tema:"PESCA E AQUICULTURA", row:["P",null,null,null,"R",null,null,"P","P",null,null,"P",null,null,null,null,null]},
+   ]
+ },
+ {
+   titulo:"Câmara Técnica de Incêndios Florestais e Proteção Ambiental",
+   head:["RP",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+   eixos:[
+    {tema:"SUPRESSÃO DE INCÊNDIOS FLORESTAIS", row:["P","R",null,null,null,null,null,null,null,null,"P","P","P",null,null,null,null]},
+    {tema:"PROTEÇÃO AMBIENTAL EM ÁREAS DE RESERVA", row:["P",null,null,null,null,null,null,null,null,null,"P","R",null,null,null,null,null]},
+    {tema:"PROTEÇÃO AMBIENTAL NO MEIO RURAL", row:["P","P",null,null,null,null,null,"R",null,"P",null,"P",null,null,null,null,null]},
+   ]
+ },
+ {
+   titulo:"Câmara Técnica de Infraestrutura, Energia e Recursos Hídricos",
+   head:[null,null,null,null,null,null,null,null,null,null,"RP",null,null,null,null,null,null],
+   eixos:[
+    {tema:"SEGURANÇA ENERGÊTICA", row:["P",null,null,null,null,null,null,null,null,null,null,null,null,"R","P",null,null]},
+    {tema:"RECURSOS HÍDRICOS E SANEAMENTO", row:["P",null,null,null,null,null,null,null,null,null,null,"R",null,null,"P","P","P"]},
+   ]
+ },
+];
+
+// Eixos Transversais: quadro equivalente (mesma lógica R/P), construído a partir dos dados internos
+// do Sistema — NÃO consta na planilha oficial Matriz AxR, que cobre apenas as 4 Câmaras Técnicas.
+const axrTransversaisOrgs = ['SEGOV','Assejur (SEDEC)','SES','INEA','SEAPPADI','SEEDUC','Casa Civil','SEFAZ','SEPLAG','SEDEC'];
+const axrTransversaisRows = [
+ {tema:'Comunicação Social e Alerta à População', row:['R',null,'P','P','P','P','P',null,null,null]},
+ {tema:'Captação de Recursos e Articulação Federativa', row:[null,null,null,null,null,null,'P','R','R','P']},
+];
 
 const decreto = [
  {tag:'Preâmbulo', titulo:'Considerandos', body:`
@@ -959,7 +1072,7 @@ function renderGovCamaras(){
   });
   const t = eixosTransversais;
   const tbox = el('button','oc-box link',
-    `${t.numero} · ${t.titulo}<span class="oc-sub">${t.coord}</span><span class="oc-goto">Ver Eixos Transversais →</span>`);
+    `${t.titulo}<span class="oc-sub">${t.coord}</span><span class="oc-goto">Ver Eixos Transversais →</span>`);
   tbox.setAttribute('type','button');
   tbox.setAttribute('aria-label', `Ir para ${t.titulo}`);
   tbox.onclick = ()=> goToTransversais();
@@ -1034,7 +1147,6 @@ function renderTransversais(){
   const card = el('div','camara-card');
   card.id = 'transv-card';
   const head = el('div','camara-head', `
-    <div class="tag">${c.numero}</div>
     <h3>${c.titulo}</h3>
     <div class="camara-meta">
       <span><b>Secretaria Coordenadora:</b> ${c.coord}</span>
@@ -1067,19 +1179,22 @@ function renderTransversais(){
 
 /* ---- órgãos view ---- */
 function renderOrgaos(){
-  // which official orgs participate in which camaras
-  const participation = {}; // sigla -> Set(camara numero)
-  const extraOrgs = {}; // sigla not in art5 -> Set(camara numero + eixo tema)
+  // which official orgs participate in which camaras, and via which eixos specifically
+  const participation = {}; // sigla -> { camara numero -> Set(eixo temas) }
+  const extraOrgs = {}; // sigla not in art5 -> [ "label · eixo tema" ]
   const officialSiglas = new Set(orgaosArt5.map(o=>o.sigla));
+  const isTransv = n => n === eixosTransversais.numero;
+  const camaraLabel = n => isTransv(n) ? 'Eixo Transversal' : n;
   camarasAll.forEach(c=>{
     c.eixos.forEach(e=>{
       e.participantes.forEach(p=>{
         if(officialSiglas.has(p)){
-          if(!participation[p]) participation[p]=new Set();
-          participation[p].add(c.numero);
+          if(!participation[p]) participation[p]={};
+          if(!participation[p][c.numero]) participation[p][c.numero]=new Set();
+          participation[p][c.numero].add(e.tema);
         } else {
           if(!extraOrgs[p]) extraOrgs[p]=[];
-          extraOrgs[p].push(`${c.numero} · ${e.tema}`);
+          extraOrgs[p].push(`${camaraLabel(c.numero)} · ${e.tema}`);
         }
       });
     });
@@ -1089,9 +1204,11 @@ function renderOrgaos(){
   const table = el('table','dtable');
   table.innerHTML = `<thead><tr><th>Nº</th><th>Sigla</th><th>Órgão</th><th>Câmaras Técnicas em que participa</th></tr></thead>
    <tbody>${orgaosArt5.map(o=>{
-     const camarasSet = participation[o.sigla];
-     const cell = camarasSet ? Array.from(camarasSet).sort().map(n=>`<span class="chip coord">${n}</span>`).join(' ')
-       : '<span class="flag warn">não mapeado ainda</span>';
+     const camarasObj = participation[o.sigla];
+     const cell = camarasObj ? Object.keys(camarasObj).sort().map(n=>{
+       const eixosList = Array.from(camarasObj[n]).join('; ');
+       return `<span class="chip coord" title="Eixo(s): ${eixosList}">${camaraLabel(n)}</span>`;
+     }).join(' ') : '<span class="flag warn">não mapeado ainda</span>';
      return `<tr><td>${o.n}</td><td><b>${o.sigla}</b></td><td>${o.nome}</td><td>${cell}</td></tr>`;
    }).join('')}</tbody>`;
   tableWrap.appendChild(table);
@@ -1180,6 +1297,46 @@ function renderAcoes(){
   });
 }
 
+/* ---- matriz AxR ---- */
+function toTitleCasePt(s){
+  const lower = new Set(['de','da','do','das','dos','e','em','no','na','nos','nas','para','com']);
+  return s.toLowerCase().split(' ').map((w,i)=>{
+    if(i>0 && lower.has(w)) return w;
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }).join(' ');
+}
+
+function axrCellHtml(val){
+  if(!val) return '<td></td>';
+  return `<td><span class="axr-badge ${val.toLowerCase()}">${val}</span></td>`;
+}
+
+function axrHeaderHtml(orgs){
+  return '<thead><tr><th class="axr-rowhead axr-corner">Câmara Técnica / Eixo Temático</th>'
+    + orgs.map(o=>`<th>${o}</th>`).join('') + '</tr></thead>';
+}
+
+function renderAxrTable(){
+  const table = document.getElementById('axrTable');
+  let body = '<tbody>';
+  axrCamaras.forEach(ct=>{
+    body += `<tr class="axr-ct-row"><td class="axr-rowhead">${ct.titulo}</td>` + ct.head.map(axrCellHtml).join('') + '</tr>';
+    ct.eixos.forEach(e=>{
+      body += `<tr class="axr-eixo-row"><td class="axr-rowhead">${toTitleCasePt(e.tema)}</td>` + e.row.map(axrCellHtml).join('') + '</tr>';
+    });
+  });
+  body += '</tbody>';
+  table.innerHTML = axrHeaderHtml(axrOrgs) + body;
+}
+
+function renderAxrTransversaisTable(){
+  const table = document.getElementById('axrTransversaisTable');
+  let body = '<tbody>' + axrTransversaisRows.map(r=>
+    `<tr class="axr-eixo-row"><td class="axr-rowhead">${toTitleCasePt(r.tema)}</td>` + r.row.map(axrCellHtml).join('') + '</tr>'
+  ).join('') + '</tbody>';
+  table.innerHTML = axrHeaderHtml(axrTransversaisOrgs) + body;
+}
+
 function openLightbox(src, alt){
   const lb = document.getElementById('lightbox');
   document.getElementById('lightboxImg').src = src;
@@ -1195,7 +1352,11 @@ document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLightbox()
 /* ============================================================
    NAV / INIT
    ============================================================ */
+let previousView = 'visao-geral';
 function showView(viewName){
+  const current = document.querySelector('.view.active');
+  if(current && current.id === 'view-'+viewName) return;
+  if(current) previousView = current.id.replace('view-','');
   document.querySelectorAll('#mainnav button').forEach(b=>b.classList.toggle('active', b.dataset.view===viewName));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+viewName).classList.add('active');
@@ -1275,6 +1436,8 @@ renderOrgaos();
 renderRoadmap();
 renderLegislacao();
 renderAcoes();
+renderAxrTable();
+renderAxrTransversaisTable();
 </script>
 </body>
 </html>
