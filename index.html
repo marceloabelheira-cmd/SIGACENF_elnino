@@ -378,6 +378,36 @@
     margin-bottom:4px;
   }
   .module-section-intro{font-size:13.5px; color:var(--text-secondary); margin:0 0 14px 0; max-width:70ch;}
+  /* módulo de recursos */
+  .aviso-ficticio{
+    display:flex; gap:11px; align-items:flex-start; background:#fdecd2; border:1px solid #f0c884; color:#6b4700;
+    border-radius:10px; padding:14px 16px; margin-bottom:20px; font-size:13px; line-height:1.55;
+  }
+  .aviso-ficticio svg{flex-shrink:0; margin-top:1px;}
+  .aviso-ficticio b{font-weight:800;}
+  [data-theme="dark"] .aviso-ficticio{background:#3a2c0f; border-color:#6b5220; color:#f0c884;}
+  .recursos-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px;}
+  .recurso-cat-group{margin-bottom:22px;}
+  .recurso-cat-group:last-child{margin-bottom:0;}
+  .recurso-cat-label{
+    font-size:12.5px; font-weight:800; color:var(--text-primary); margin-bottom:10px;
+    display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .recurso-cat-label svg{color:var(--brand); flex-shrink:0;}
+  .recurso-card{
+    border:1px solid var(--border); border-radius:12px; background:var(--surface-1); padding:14px 16px;
+    box-shadow:var(--shadow-1); transition:box-shadow .15s, transform .15s;
+  }
+  .recurso-card:hover{box-shadow:var(--shadow-2); transform:translateY(-1px);}
+  .recurso-top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+  .recurso-orgao{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; text-align:right;}
+  .recurso-nome{font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:6px; line-height:1.35;}
+  .recurso-row{font-size:12.5px; color:var(--text-secondary); line-height:1.6;}
+  .recurso-row b{color:var(--text-primary); font-weight:600;}
+  .recurso-row + .recurso-row{margin-top:2px;}
+  .recurso-card.is-hidden{display:none;}
+  .recurso-cat-group.is-hidden{display:none;}
+  .module-section.is-hidden{display:none;}
   /* cartões de recurso externo (planos e dados / matérias e reportagens) */
   .resource-list{display:flex; flex-direction:column; gap:14px;}
   .resource-card{border:1px solid var(--border); border-radius:12px; padding:16px 20px; background:var(--surface-1); box-shadow:var(--shadow-1);}
@@ -754,6 +784,41 @@
       <div class="reunioes-list" id="reunioesList"></div>
     </section>
 
+    <!-- ================= MÓDULO DE RECURSOS ================= -->
+    <section class="view" id="view-recursos">
+      <div class="view-header">
+        <button class="back-link" type="button" onclick="showView('roadmap')">← Voltar ao Roadmap do Sistema</button>
+        <div class="eyebrow">Módulo 3 do Roadmap · em desenvolvimento</div>
+        <h1>Módulo de Recursos</h1>
+        <p class="view-intro">Banco de recursos humanos e materiais disponíveis por órgão para o enfrentamento aos efeitos do El Niño. Na versão completa deste módulo, cada órgão poderá cadastrar e atualizar seus próprios recursos diretamente pelo sistema.</p>
+      </div>
+
+      <div class="aviso-ficticio">
+        <span id="avisoFicticioIcon"></span>
+        <div><b>Atenção:</b> os recursos listados abaixo são fictícios e servem apenas como exemplo de layout e funcionamento deste módulo. Nenhum dado aqui reflete efetivo, viaturas ou insumos reais de qualquer órgão. Assim que o backend estiver disponível, os órgãos poderão cadastrar seus recursos reais diretamente pelo sistema.</div>
+      </div>
+
+      <div class="stats-row" id="recursosStatsRow"></div>
+
+      <div class="searchbar-row">
+        <div class="searchbar"><input type="text" id="recursosSearch" placeholder="Buscar por equipe, órgão, viatura, equipamento…"></div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Seção A · Recursos Humanos</div>
+        <p class="module-section-intro">Equipes técnicas e operacionais disponíveis para as ações do Comitê (exemplo ilustrativo).</p>
+        <div class="recursos-grid" id="recursosHumanosList"></div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Seção B · Recursos Materiais</div>
+        <p class="module-section-intro">Viaturas, equipamentos e insumos disponíveis, organizados por categoria (exemplo ilustrativo).</p>
+        <div id="recursosMateriaisGroups"></div>
+      </div>
+
+      <div class="filter-empty" id="recursosEmpty" style="display:none;">Nenhum recurso encontrado para essa busca.</div>
+    </section>
+
     <!-- ================= MÓDULO DE AÇÕES (PREVENTIVAS) ================= -->
     <section class="view" id="view-acoes">
       <div class="view-header">
@@ -1074,8 +1139,8 @@ const modules = [
   desc:'Seção A — Legislação: decreto na íntegra, resoluções complementares da Sala de Situação (art. 12), atos de prorrogação (art. 15) e normas correlatas. Seção B — Planos e Dados: guias práticos e ferramentas de apoio à tomada de decisão. Já iniciado neste v0.1.'},
  {n:'02', title:'Módulo de Reuniões', reqs:['backend'], view:'reunioes',
   desc:'Atas e relatórios de reunião por Câmara Técnica/eixo: pauta, presentes, encaminhamentos e prazos — informação dinâmica atualizada ao longo do tempo. Amostra estática (v0.1) já iniciada.'},
- {n:'03', title:'Módulo de Recursos', reqs:['backend'],
-  desc:'Banco de dados de recursos humanos e materiais disponíveis por órgão, câmara técnica e eixo temático (equipes, viaturas, insumos, capacidade de resposta).'},
+ {n:'03', title:'Módulo de Recursos', reqs:['backend'], view:'recursos',
+  desc:'Banco de dados de recursos humanos e materiais disponíveis por órgão, câmara técnica e eixo temático (equipes, viaturas, insumos, capacidade de resposta). Amostra ilustrativa (v0.1), com dados fictícios, já iniciada.'},
  {n:'04', title:'Módulo de Ações', reqs:['backend'], view:'acoes',
   desc:'Registro de ações realizadas ou programadas — com destaque para as preventivas — com o quê, quando, onde, por quem, como, status e mapa com a divisão dos municípios do RJ. Amostra estática (v0.1) já iniciada.'},
  {n:'05', title:'Painéis de Inteligência', reqs:['backend','frontend'], view:'paineis',
@@ -1413,6 +1478,37 @@ const acoesPreventivas = [
  },
 ];
 
+/* ---- Módulo de Recursos: recursos humanos e materiais (dados FICTÍCIOS, apenas para ilustrar o layout do módulo — v0.1, sem backend) ---- */
+const recursosHumanos = [
+ {equipe:'Equipe de Resgate Aquático', orgao:'CBMERJ', efetivo:'12 militares', especialidade:'Busca e salvamento em áreas alagadas e reservatórios', disponibilidade:'Prontidão 24h', dispFlag:'finalizado', base:'Quartel Central — Centro, RJ'},
+ {equipe:'Brigada de Incêndio Florestal', orgao:'CBMERJ / INEA', efetivo:'25 brigadistas', especialidade:'Combate a incêndios florestais e apoio ao Programa Fumaça Zero', disponibilidade:'Prontidão sazonal (temporada seca)', dispFlag:'warn', base:'Base Regional Serrana — Teresópolis'},
+ {equipe:'Equipe de Vigilância Epidemiológica', orgao:'SES / SUPAN', efetivo:'8 profissionais', especialidade:'Monitoramento de doenças e óbitos agravados pelo calor extremo', disponibilidade:'Escala diurna (dias úteis)', dispFlag:'ok', base:'CIEVS — Setor de Vigilância'},
+ {equipe:'Equipe de Assistência Social Emergencial', orgao:'SEDSODH', efetivo:'15 assistentes sociais', especialidade:'Atendimento a população em situação de vulnerabilidade (idosos, crianças, pessoas em situação de rua)', disponibilidade:'Prontidão 24h', dispFlag:'finalizado', base:'Sede SEDSODH'},
+ {equipe:'Equipe Técnica de Recursos Hídricos', orgao:'INEA', efetivo:'6 engenheiros e analistas', especialidade:'Monitoramento de reservatórios e mananciais, apoio a planos de contingência hídrica', disponibilidade:'Sob demanda', dispFlag:'ok', base:'INEA — Sede'},
+ {equipe:'Núcleo de Comunicação e Alerta', orgao:'SEGOV / SUBSEGOP', efetivo:'5 profissionais', especialidade:'Emissão de alertas à população e campanhas educativas', disponibilidade:'Escala diurna (dias úteis)', dispFlag:'ok', base:'SUBSEGOP — Sede'},
+];
+
+const RECURSO_MAT_STATUS = {
+ operacional: {label:'Operacional', flagClass:'finalizado'},
+ disponivel:  {label:'Disponível',  flagClass:'finalizado'},
+ estoque:     {label:'Em estoque',  flagClass:'ok'},
+ manutencao:  {label:'Em manutenção', flagClass:'warn'},
+ indisponivel:{label:'Indisponível', flagClass:'cancelado'},
+};
+
+const recursosMateriais = [
+ {categoria:'Transporte', item:'Viaturas de Combate a Incêndio (ABT)', orgao:'CBMERJ', quantidade:'18 unidades', status:'operacional', obs:'Distribuídas entre quartéis da Capital e da Região Serrana.'},
+ {categoria:'Transporte', item:'Caminhões-pipa', orgao:'SEAS / concessionária', quantidade:'6 unidades', status:'disponivel', obs:'Apoio a municípios em colapso hídrico.'},
+ {categoria:'Transporte', item:'Ambulâncias de Suporte Avançado', orgao:'SES', quantidade:'10 unidades', status:'operacional', obs:'Alocadas conforme demanda das regiões de saúde.'},
+ {categoria:'Transporte', item:'Aeronave Aeromédica/Aérea', orgao:'CBMERJ (GOA)', quantidade:'2 aeronaves', status:'operacional', obs:'Resgate e reconhecimento aéreo de áreas de difícil acesso.'},
+ {categoria:'Equipamentos', item:'Motobombas de Alta Vazão', orgao:'CBMERJ', quantidade:'15 unidades', status:'operacional', obs:'Combate a incêndio e apoio ao abastecimento emergencial.'},
+ {categoria:'Equipamentos', item:'Abafadores e Bombas Costais', orgao:'CBMERJ / INEA', quantidade:'200 unidades', status:'estoque', obs:'Distribuídos às bases regionais de combate a incêndio florestal.'},
+ {categoria:'Equipamentos', item:'Geradores de Energia Portáteis', orgao:'SEENEMAR', quantidade:'20 unidades', status:'estoque', obs:'Reserva para apoio em pontos críticos de fornecimento de energia.'},
+ {categoria:'Equipamentos', item:'Kits de Hidratação Móvel', orgao:'SES', quantidade:'40 kits', status:'estoque', obs:'Uso em pontos de hidratação pública em dias críticos.'},
+ {categoria:'Insumos', item:'Água Potável Envasada (reserva emergencial)', orgao:'SEDEC', quantidade:'50.000 litros', status:'estoque', obs:'Reserva estratégica para distribuição emergencial.'},
+ {categoria:'Insumos', item:'Kits de Primeiros Socorros', orgao:'SES', quantidade:'300 kits', status:'estoque', obs:'Distribuição a equipes de campo e pontos de apoio.'},
+];
+
 const dataNotes = [
  'CT2 (Agricultura): nos eixos "Agricultura e Agricultura Familiar" e "Pesca e Aquicultura", o campo "Órgão Coordenador" aparece como "SUPAN (SES)" e "SEDSODH" — nomes que se repetem de CT1 e parecem inconsistentes com o tema da câmara. Vale confirmar se é erro de preenchimento/cópia na planilha original.',
  'O nome da SEAPPADI no art. 5º ("Agricultura, Pecuária e Abastecimento") é mais curto do que o nome usado nas Câmaras Técnicas ("Agricultura, Pecuária, Pesca, Abastecimento e Desenvolvimento do Interior") — provavelmente a mesma secretaria, mas com denominações desatualizadas em uma das fontes.',
@@ -1746,6 +1842,12 @@ function renderLegislacao(){
 /* ---- módulo de ações: ações preventivas ---- */
 const igIcon = `<svg class="ig-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
 const pdfIcon = `<svg class="ig-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>`;
+const avisoIcon = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+const recursoCatIcons = {
+  'Transporte': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h3.5l3 4v4h-6.5"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>`,
+  'Equipamentos': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+  'Insumos': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v4H3z"/><path d="M5 7v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7"/><line x1="10" y1="12" x2="14" y2="12"/></svg>`,
+};
 
 /* ---- cartões de recurso externo (Planos e Dados / Matérias e Reportagens) ---- */
 function renderResourceList(containerId, items){
@@ -1793,6 +1895,98 @@ function populateEixoFilterSelect(selectEl, camaraId){
   selectEl.innerHTML = '<option value="">Todos os eixos</option>' +
     eixos.map(e=>`<option value="${e.tema}">${e.tema}</option>`).join('');
 }
+
+/* ---- módulo de recursos (humanos e materiais) ---- */
+function renderRecursosStats(){
+  const row = document.getElementById('recursosStatsRow');
+  if(!row) return;
+  const efetivoTotal = recursosHumanos.reduce((sum,r)=>{
+    const n = parseInt(r.efetivo, 10);
+    return sum + (isNaN(n) ? 0 : n);
+  }, 0);
+  const categorias = new Set(recursosMateriais.map(r=>r.categoria)).size;
+  const stats = [
+    {label:'Equipes cadastradas', value:String(recursosHumanos.length)},
+    {label:'Efetivo total (aprox.)', value:String(efetivoTotal)},
+    {label:'Categorias de material', value:String(categorias)},
+    {label:'Itens materiais catalogados', value:String(recursosMateriais.length)},
+  ];
+  row.innerHTML = '';
+  stats.forEach(s=>{
+    row.appendChild(el('div','stat-tile', `<div class="label">${s.label}</div><div class="value">${s.value}</div>`));
+  });
+}
+
+function renderRecursos(){
+  const avisoIconSlot = document.getElementById('avisoFicticioIcon');
+  if(avisoIconSlot) avisoIconSlot.innerHTML = avisoIcon;
+  renderRecursosStats();
+  const humWrap = document.getElementById('recursosHumanosList');
+  const matWrap = document.getElementById('recursosMateriaisGroups');
+  if(!humWrap || !matWrap) return;
+  humWrap.innerHTML = '';
+  recursosHumanos.forEach(r=>{
+    const card = el('div','recurso-card recurso-humano');
+    card.dataset.search = `${r.equipe} ${r.orgao} ${r.especialidade} ${r.base}`.toLowerCase();
+    card.innerHTML = `
+      <div class="recurso-top">
+        <span class="flag ${r.dispFlag}">${r.disponibilidade}</span>
+        <span class="recurso-orgao">${r.orgao}</span>
+      </div>
+      <div class="recurso-nome">${r.equipe}</div>
+      <div class="recurso-row"><b>Efetivo:</b> ${r.efetivo}</div>
+      <div class="recurso-row"><b>Especialidade:</b> ${r.especialidade}</div>
+      <div class="recurso-row"><b>Base/Lotação:</b> ${r.base}</div>`;
+    humWrap.appendChild(card);
+  });
+
+  const categorias = [...new Set(recursosMateriais.map(r=>r.categoria))];
+  matWrap.innerHTML = '';
+  categorias.forEach(cat=>{
+    const group = el('div','recurso-cat-group');
+    group.dataset.cat = cat;
+    const itens = recursosMateriais.filter(r=>r.categoria===cat);
+    const cardsHtml = itens.map(r=>{
+      const meta = RECURSO_MAT_STATUS[r.status] || RECURSO_MAT_STATUS.estoque;
+      const search = `${r.item} ${r.orgao} ${r.obs}`.toLowerCase();
+      return `<div class="recurso-card recurso-material" data-search="${search}">
+        <div class="recurso-top">
+          <span class="flag ${meta.flagClass}">${meta.label}</span>
+          <span class="recurso-orgao">${r.orgao}</span>
+        </div>
+        <div class="recurso-nome">${r.item}</div>
+        <div class="recurso-row"><b>Quantidade:</b> ${r.quantidade}</div>
+        <div class="recurso-row">${r.obs}</div>
+      </div>`;
+    }).join('');
+    group.innerHTML = `<div class="recurso-cat-label">${recursoCatIcons[cat]||''} ${cat}</div>
+      <div class="recursos-grid">${cardsHtml}</div>`;
+    matWrap.appendChild(group);
+  });
+}
+
+function filterRecursos(query){
+  const q = query.trim().toLowerCase();
+  const cards = document.querySelectorAll('#view-recursos .recurso-card');
+  let anyVisible = false;
+  cards.forEach(card=>{
+    const matches = !q || (card.dataset.search||'').includes(q);
+    card.classList.toggle('is-hidden', !matches);
+    if(matches) anyVisible = true;
+  });
+  document.querySelectorAll('#recursosMateriaisGroups .recurso-cat-group').forEach(group=>{
+    const visibleCards = group.querySelectorAll('.recurso-card:not(.is-hidden)');
+    group.classList.toggle('is-hidden', q && visibleCards.length===0);
+  });
+  const humSection = humWrapSection();
+  if(humSection){
+    const visibleHum = humSection.querySelectorAll('.recurso-card:not(.is-hidden)');
+    humSection.closest('.module-section').classList.toggle('is-hidden', q && visibleHum.length===0);
+  }
+  const empty = document.getElementById('recursosEmpty');
+  if(empty) empty.style.display = (q && !anyVisible) ? 'block' : 'none';
+}
+function humWrapSection(){ return document.getElementById('recursosHumanosList'); }
 
 function renderReunioes(){
   const wrap = document.getElementById('reunioesList');
@@ -2282,6 +2476,7 @@ document.querySelectorAll('#mainnav button').forEach(btn=>{
 });
 
 document.getElementById('camaraSearch').addEventListener('input', (e)=>renderCamaras(e.target.value));
+document.getElementById('recursosSearch').addEventListener('input', (e)=>filterRecursos(e.target.value));
 
 const themeToggle = document.getElementById('themeToggle');
 themeToggle.addEventListener('click', ()=>{
@@ -2356,6 +2551,7 @@ renderRoadmap();
 renderLegislacao();
 renderPlanosDados();
 renderPaineisIntel();
+renderRecursos();
 renderReunioes();
 renderAcoes();
 renderAcoesMap();
