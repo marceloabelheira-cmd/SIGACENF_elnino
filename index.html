@@ -261,13 +261,38 @@
   .eixo-item{border-bottom:1px solid var(--grid);}
   .eixo-item:last-child{border-bottom:none;}
   .eixo-head{
-    all:unset; cursor:pointer; box-sizing:border-box; width:100%; display:flex; align-items:center;
-    justify-content:space-between; gap:14px; padding:15px 20px; transition:background .12s;
+    box-sizing:border-box; width:100%; display:flex; align-items:center; flex-wrap:wrap;
+    gap:10px 16px; padding:15px 20px; transition:background .12s;
   }
-  .eixo-head:hover{background:var(--page);}
-  .eixo-head:focus-visible{outline:2px solid var(--brand); outline-offset:-2px;}
   .eixo-item.open > .eixo-head{background:var(--brand-soft);}
+  .eixo-titlearea{cursor:pointer; flex:1 1 auto; min-width:160px; border-radius:6px;}
+  .eixo-head .acc-hint{cursor:pointer; flex-shrink:0; border-radius:6px;}
+  .eixo-titlearea:focus-visible, .eixo-head .acc-hint:focus-visible{outline:2px solid var(--brand); outline-offset:2px;}
+  .eixo-head-actions{display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap;}
+  .eixo-link-btn{
+    all:unset; cursor:pointer; font-size:11px; font-weight:700; padding:6px 11px; border-radius:6px;
+    border:1px solid var(--border); color:var(--brand); background:var(--surface-1); white-space:nowrap;
+    transition:border-color .12s, background .12s; box-sizing:border-box;
+  }
+  .eixo-link-btn:hover, .eixo-link-btn:focus-visible{border-color:var(--brand); background:var(--brand-soft); outline:none;}
   .eixo-kicker{font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brand); display:block; margin-bottom:4px;}
+  /* filtros de Reuniões / Ações por Câmara Técnica e Eixo */
+  .filter-bar{display:flex; align-items:center; gap:12px 14px; flex-wrap:wrap; margin-bottom:18px; padding:14px 16px; background:var(--surface-1); border:1px solid var(--border); border-radius:10px;}
+  .filter-field{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .filter-field label{font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.03em;}
+  .filter-select{
+    padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2);
+    color:var(--text-primary); font-size:13px; min-width:210px; max-width:100%;
+  }
+  .filter-select:disabled{opacity:.55; cursor:not-allowed;}
+  .filter-select:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft);}
+  .filter-clear-btn{
+    all:unset; cursor:pointer; font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:8px;
+    border:1px solid var(--border); color:var(--text-secondary); background:var(--surface-2); white-space:nowrap;
+    transition:border-color .12s, color .12s; box-sizing:border-box;
+  }
+  .filter-clear-btn:hover, .filter-clear-btn:focus-visible{border-color:var(--brand); color:var(--brand); outline:none;}
+  .filter-empty{color:var(--text-secondary); padding:26px 20px; text-align:center; font-size:13.5px; border:1px dashed var(--border); border-radius:10px; background:var(--surface-1);}
   .eixo-tema{font-size:16px; font-weight:700; color:var(--text-primary); line-height:1.3;}
   .eixo-body{display:none; padding:0 20px 18px 20px;}
   .eixo-item.open .eixo-body{display:block;}
@@ -387,7 +412,20 @@
   .acoes-map-note{font-size:11.5px; color:var(--text-muted); margin:2px 0 12px 0;}
   .acoes-map-legend{display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--text-secondary);}
   .acoes-map-legend .legend-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:middle;}
-  .acoes-map-svg{width:100%; height:auto; max-height:620px; display:block;}
+  .acoes-map-viewport{position:relative; overflow:hidden; border-radius:8px; background:var(--surface-2);}
+  .acoes-map-svg{width:100%; height:auto; max-height:620px; display:block; cursor:grab; touch-action:none;}
+  .acoes-map-svg.dragging{cursor:grabbing;}
+  .map-zoom-controls{position:absolute; top:10px; right:10px; z-index:2; display:flex; flex-direction:column; gap:6px;}
+  .map-zoom-btn{
+    all:unset; box-sizing:border-box; width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+    border-radius:7px; border:1px solid var(--border); background:var(--surface-1); color:var(--text-primary);
+    font-size:16px; font-weight:700; line-height:1; cursor:pointer; box-shadow:var(--shadow-1);
+    transition:background .12s, border-color .12s, color .12s;
+  }
+  .map-zoom-btn:hover{border-color:var(--brand); background:var(--brand-soft); color:var(--brand);}
+  .map-zoom-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .map-zoom-btn:focus-visible{outline:2px solid var(--brand); outline-offset:2px;}
+  .acoes-map-zoom-hint{font-size:11px; color:var(--text-muted); margin:8px 0 0 0; text-align:right;}
   .mun-shape{fill:var(--surface-2); stroke:var(--border); stroke-width:.6; stroke-linejoin:round; transition:fill .12s;}
   .mun-shape:hover{fill:var(--brand-soft);}
   .mun-shape.mun-highlight{fill:var(--brand-soft); stroke:var(--brand); stroke-width:1;}
@@ -699,6 +737,17 @@
         <h1>Módulo de Reuniões</h1>
         <p class="view-intro">Amostra estática (v0.1) de reuniões das Câmaras Técnicas/eixos, ordenadas por data. Na versão completa deste módulo, cada reunião será registrada com ata, pauta, presentes e encaminhamentos, diretamente pelo sistema.</p>
       </div>
+      <div class="filter-bar">
+        <div class="filter-field">
+          <label for="reunioesCamaraFilter">Câmara Técnica</label>
+          <select class="filter-select" id="reunioesCamaraFilter"></select>
+        </div>
+        <div class="filter-field">
+          <label for="reunioesEixoFilter">Eixo</label>
+          <select class="filter-select" id="reunioesEixoFilter"></select>
+        </div>
+        <button type="button" class="filter-clear-btn" id="reunioesFilterClear">Limpar filtro</button>
+      </div>
       <div class="reunioes-list" id="reunioesList"></div>
     </section>
 
@@ -709,6 +758,18 @@
         <div class="eyebrow">Módulo 4 do Roadmap · em desenvolvimento</div>
         <h1>Ações Preventivas</h1>
         <p class="view-intro">Amostra estática (v0.1) de ações preventivas já realizadas ou programadas pelo Comitê/GRAC, cada uma registrada com o quê, quando, onde, por quem, como e status. Na versão completa deste módulo, o cadastro de novas ações — inclusive treinamentos e simulados — será feito diretamente pelo sistema.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-field">
+          <label for="acoesCamaraFilter">Câmara Técnica</label>
+          <select class="filter-select" id="acoesCamaraFilter"></select>
+        </div>
+        <div class="filter-field">
+          <label for="acoesEixoFilter">Eixo</label>
+          <select class="filter-select" id="acoesEixoFilter"></select>
+        </div>
+        <button type="button" class="filter-clear-btn" id="acoesFilterClear">Limpar filtro</button>
       </div>
 
       <div class="acoes-map-wrap">
@@ -1146,6 +1207,7 @@ const materias = [
 const reunioes = [
  {
    camaraEixo:'I · Saúde e Proteção Social — Eixo: Saúde Pública e Proteção da População Vulnerável',
+   camaraId:'ct1', eixoTema:'Saúde Pública',
    dataSort:'2026-07-28', data:'28/07/2026', horario:'09:30 – 10:30',
    assunto:'Reunião 02 do Eixo Saúde',
    responsavel:'Cel Simone Simões',
@@ -1155,6 +1217,7 @@ const reunioes = [
  },
  {
    camaraEixo:'I · Saúde e Proteção Social — Eixo: Unidade Escolar (Educação)',
+   camaraId:'ct1', eixoTema:'Unidade Escolar',
    dataSort:'2026-07-29', data:'29/07/2026', horario:'09:30 – 10:30',
    assunto:'Alinhamento Institucional, Cooperação Técnica El Niño',
    responsavel:'Ten Cel BM Adriana Bianchi',
@@ -1163,6 +1226,7 @@ const reunioes = [
  },
  {
    camaraEixo:'IV · Infraestrutura, Energia e Recursos Hídricos — Eixo: Segurança Hídrica',
+   camaraId:'ct4', eixoTema:'Recursos Hídricos e Saneamento',
    dataSort:'2026-08-04', data:'04/08/2026', horario:'14:00 – 15:00',
    assunto:'Apresentação de proposta das discussões da reunião anterior',
    responsavel:'Ten Cel Fábio Gonçalves',
@@ -1297,12 +1361,13 @@ const paineisIntel = [
 const acoesPreventivas = [
  {
    titulo:'Simulado do GRAC',
+   camaraId:null, eixoTema:null,
    oQue:'Simulado de Mesa de Seca, Estiagem e Incêndio Florestal 2026',
    dataSort:'2026-05-21', quando:'21/05/2026',
    status:'finalizado',
    quem:'GRAC — Ten Cel Carlos Cunha, Ten Cel Diogo Rocha e Ten Cel Fábio Gonçalves (condução), com 34 agências participantes',
    municipio:'Rio de Janeiro',
-   onde:'Rio de Janeiro (Capital) — Sala de Situação / Centro de Operações do GRAC',
+   onde:'Rio de Janeiro (Capital) — DGDEC (Diretoria Geral de Defesa Civil), Praça da Bandeira',
    como:'Simulado de mesa (tabletop exercise), reunindo presencialmente representantes de 34 agências estaduais e municipais em um exercício coordenado de resposta a cenários de seca, estiagem e incêndio florestal.',
    resumo:'Simulado de Mesa de Seca, Estiagem e Incêndio Florestal 2026, reunindo 34 agências em um exercício coordenado. Mensagem de reconhecimento do Cel Joelson aos Ten Cel Carlos Cunha, Diogo Rocha e Fábio Gonçalves pela condução dos trabalhos do GRAC.',
    imgUrl:ACAO_GRAC_IMG_URL,
@@ -1310,6 +1375,7 @@ const acoesPreventivas = [
  },
  {
    titulo:'Entrega do PLANCON',
+   camaraId:null, eixoTema:null,
    oQue:'Lançamento oficial do Plano de Contingência de Estiagem, Seca e Incêndio Florestal do Estado do Rio de Janeiro',
    dataSort:'2026-07-07', quando:'07/07/2026',
    status:'finalizado',
@@ -1470,15 +1536,26 @@ function renderCamaras(filter=''){
 
     eixosData.forEach(({e, forceOpen})=>{
       const item = el('div','eixo-item'+(forceOpen?' open':''));
-      const eixoHead = el('button','eixo-head');
+      const eixoHead = el('div','eixo-head');
       eixoHead.innerHTML = `
-        <span><span class="eixo-kicker">Eixo</span><span class="eixo-tema">${e.tema}</span></span>
-        <span class="acc-hint"><span class="hint-text">${forceOpen?'clique para reduzir':'clique para expandir'}</span><span class="chev">▶</span></span>`;
-      eixoHead.onclick = ()=>{
+        <span class="eixo-titlearea" tabindex="0" role="button"><span class="eixo-kicker">Eixo</span><span class="eixo-tema">${e.tema}</span></span>
+        <span class="acc-hint"><span class="hint-text">${forceOpen?'clique para reduzir':'clique para expandir'}</span><span class="chev">▶</span></span>
+        <div class="eixo-head-actions">
+          <button type="button" class="eixo-link-btn eixo-reunioes-btn">Reuniões deste Eixo</button>
+          <button type="button" class="eixo-link-btn eixo-acoes-btn">Ações deste Eixo</button>
+        </div>`;
+      const toggleEixoOpen = ()=>{
         item.classList.toggle('open');
         const open = item.classList.contains('open');
         eixoHead.querySelector('.hint-text').textContent = open ? 'clique para reduzir' : 'clique para expandir';
       };
+      eixoHead.querySelector('.eixo-titlearea').addEventListener('click', toggleEixoOpen);
+      eixoHead.querySelector('.eixo-titlearea').addEventListener('keydown', ev=>{
+        if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); toggleEixoOpen(); }
+      });
+      eixoHead.querySelector('.acc-hint').addEventListener('click', toggleEixoOpen);
+      eixoHead.querySelector('.eixo-reunioes-btn').addEventListener('click', ev=>{ ev.stopPropagation(); goToReunioesFiltered(c.id, e.tema); });
+      eixoHead.querySelector('.eixo-acoes-btn').addEventListener('click', ev=>{ ev.stopPropagation(); goToAcoesFiltered(c.id, e.tema); });
       const body = el('div','eixo-body', `
         <div class="eixo-row"><b>Of. de ligação:</b> ${e.of} &nbsp;·&nbsp; <b>Órgão coordenador:</b> ${e.orgCoord}</div>
         <div class="chips">${e.participantes.map(p=>`<span class="chip${p===e.orgCoord?' coord':''}">${p}</span>`).join('')}</div>
@@ -1514,15 +1591,26 @@ function renderTransversais(){
 
   c.eixos.forEach(e=>{
     const item = el('div','eixo-item');
-    const eixoHead = el('button','eixo-head');
+    const eixoHead = el('div','eixo-head');
     eixoHead.innerHTML = `
-      <span><span class="eixo-kicker">Eixo</span><span class="eixo-tema">${e.tema}</span></span>
-      <span class="acc-hint"><span class="hint-text">clique para expandir</span><span class="chev">▶</span></span>`;
-    eixoHead.onclick = ()=>{
+      <span class="eixo-titlearea" tabindex="0" role="button"><span class="eixo-kicker">Eixo</span><span class="eixo-tema">${e.tema}</span></span>
+      <span class="acc-hint"><span class="hint-text">clique para expandir</span><span class="chev">▶</span></span>
+      <div class="eixo-head-actions">
+        <button type="button" class="eixo-link-btn eixo-reunioes-btn">Reuniões deste Eixo</button>
+        <button type="button" class="eixo-link-btn eixo-acoes-btn">Ações deste Eixo</button>
+      </div>`;
+    const toggleEixoOpen = ()=>{
       item.classList.toggle('open');
       const open = item.classList.contains('open');
       eixoHead.querySelector('.hint-text').textContent = open ? 'clique para reduzir' : 'clique para expandir';
     };
+    eixoHead.querySelector('.eixo-titlearea').addEventListener('click', toggleEixoOpen);
+    eixoHead.querySelector('.eixo-titlearea').addEventListener('keydown', ev=>{
+      if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); toggleEixoOpen(); }
+    });
+    eixoHead.querySelector('.acc-hint').addEventListener('click', toggleEixoOpen);
+    eixoHead.querySelector('.eixo-reunioes-btn').addEventListener('click', ev=>{ ev.stopPropagation(); goToReunioesFiltered(c.id, e.tema); });
+    eixoHead.querySelector('.eixo-acoes-btn').addEventListener('click', ev=>{ ev.stopPropagation(); goToAcoesFiltered(c.id, e.tema); });
     const body = el('div','eixo-body', `
       <div class="eixo-row"><b>Of. de ligação:</b> ${e.of} &nbsp;·&nbsp; <b>Órgão coordenador:</b> ${e.orgCoord}</div>
       <div class="chips">${e.participantes.map(p=>`<span class="chip${p===e.orgCoord?' coord':''}">${p}</span>`).join('')}</div>
@@ -1655,10 +1743,45 @@ function renderMaterias(){ renderResourceList('materiasList', materias); }
 function renderPaineisIntel(){ renderResourceList('paineisIntelList', paineisIntel); }
 
 /* ---- módulo de reuniões ---- */
+let reunioesFilter = { camaraId:'', eixoTema:'' };
+let acoesFilter = { camaraId:'', eixoTema:'' };
+
+function populateCamaraFilterSelect(selectEl){
+  selectEl.innerHTML = '<option value="">Todas as Câmaras/Eixos</option>' +
+    camarasAll.map(c=>{
+      const label = c.id==='transv' ? c.titulo : `${c.numero} · ${c.titulo}`;
+      return `<option value="${c.id}">${label}</option>`;
+    }).join('');
+}
+
+function populateEixoFilterSelect(selectEl, camaraId){
+  if(!camaraId){
+    selectEl.innerHTML = '<option value="">Todos os eixos</option>';
+    selectEl.disabled = true;
+    selectEl.value = '';
+    return;
+  }
+  selectEl.disabled = false;
+  const c = camarasAll.find(x=>x.id===camaraId);
+  const eixos = c ? c.eixos : [];
+  selectEl.innerHTML = '<option value="">Todos os eixos</option>' +
+    eixos.map(e=>`<option value="${e.tema}">${e.tema}</option>`).join('');
+}
+
 function renderReunioes(){
   const wrap = document.getElementById('reunioesList');
+  wrap.innerHTML = '';
   const hojeStr = new Date().toISOString().slice(0,10);
-  const ordenadas = reunioes.slice().sort((a,b)=> a.dataSort.localeCompare(b.dataSort));
+  const filtradas = reunioes.filter(r=>{
+    if(reunioesFilter.camaraId && r.camaraId !== reunioesFilter.camaraId) return false;
+    if(reunioesFilter.eixoTema && r.eixoTema !== reunioesFilter.eixoTema) return false;
+    return true;
+  });
+  if(!filtradas.length){
+    wrap.innerHTML = '<div class="filter-empty">Nenhuma reunião encontrada para este filtro.</div>';
+    return;
+  }
+  const ordenadas = filtradas.slice().sort((a,b)=> a.dataSort.localeCompare(b.dataSort));
   ordenadas.forEach(r=>{
     const realizada = r.dataSort <= hojeStr;
     const card = el('div','reuniao-card');
@@ -1683,7 +1806,20 @@ function renderReunioes(){
 
 function renderAcoes(){
   const wrap = document.getElementById('acoesList');
-  acoesPreventivas.forEach((a,i)=>{
+  wrap.innerHTML = '';
+  const filtradas = acoesPreventivas
+    .map((a,i)=>({...a, _idx:i}))
+    .filter(a=>{
+      if(acoesFilter.camaraId && a.camaraId !== acoesFilter.camaraId) return false;
+      if(acoesFilter.eixoTema && a.eixoTema !== acoesFilter.eixoTema) return false;
+      return true;
+    });
+  if(!filtradas.length){
+    wrap.innerHTML = '<div class="filter-empty">Nenhuma ação encontrada para este filtro.</div>';
+    return;
+  }
+  filtradas.forEach(a=>{
+    const i = a._idx;
     const meta = STATUS_META[a.status] || STATUS_META.programado;
     const card = el('div','acao-card');
     card.id = 'acao-card-'+i;
@@ -1716,10 +1852,17 @@ function renderAcoesMap(){
   const wrap = document.getElementById('acoesMap');
   if(!wrap) return;
   const byMun = {};
-  acoesPreventivas.forEach((a,i)=>{
-    if(!byMun[a.municipio]) byMun[a.municipio] = [];
-    byMun[a.municipio].push({...a, idx:i});
-  });
+  acoesPreventivas
+    .map((a,i)=>({...a, idx:i}))
+    .filter(a=>{
+      if(acoesFilter.camaraId && a.camaraId !== acoesFilter.camaraId) return false;
+      if(acoesFilter.eixoTema && a.eixoTema !== acoesFilter.eixoTema) return false;
+      return true;
+    })
+    .forEach(a=>{
+      if(!byMun[a.municipio]) byMun[a.municipio] = [];
+      byMun[a.municipio].push(a);
+    });
 
   const munPaths = RJ_MUNICIPIOS.map(m=>{
     const hasAcao = !!byMun[m.nome];
@@ -1744,10 +1887,20 @@ function renderAcoesMap(){
     });
   });
   if(skipped.length) console.warn('Município(s) sem coordenada cadastrada no mapa:', skipped.join(', '));
-  wrap.innerHTML = `<svg viewBox="${RJ_MAP_VIEWBOX}" class="acoes-map-svg" role="img" aria-label="Mapa do Estado do Rio de Janeiro com a divisão dos municípios e as ações preventivas">
-    <g class="mun-layer">${munPaths}</g>
-    ${markers}
-  </svg>`;
+  wrap.innerHTML = `
+    <div class="acoes-map-viewport">
+      <div class="map-zoom-controls">
+        <button type="button" class="map-zoom-btn map-zoom-in" title="Aumentar zoom" aria-label="Aumentar zoom">+</button>
+        <button type="button" class="map-zoom-btn map-zoom-out" title="Diminuir zoom" aria-label="Diminuir zoom">−</button>
+        <button type="button" class="map-zoom-btn map-zoom-reset" title="Redefinir zoom" aria-label="Redefinir zoom">⤢</button>
+      </div>
+      <svg viewBox="${RJ_MAP_VIEWBOX}" class="acoes-map-svg" role="img" aria-label="Mapa do Estado do Rio de Janeiro com a divisão dos municípios e as ações preventivas">
+        <g class="mun-layer">${munPaths}</g>
+        ${markers}
+      </svg>
+    </div>
+    <p class="acoes-map-zoom-hint">Use a roda do mouse, os botões ao lado ou arraste o mapa para navegar. Em telas de toque, use dois dedos para dar zoom.</p>`;
+
   wrap.querySelectorAll('.map-pin').forEach(pin=>{
     const idx = pin.dataset.idx;
     const go = ()=>{
@@ -1760,6 +1913,151 @@ function renderAcoesMap(){
     pin.addEventListener('click', go);
     pin.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
   });
+
+  /* ---- zoom / pan do mapa ---- */
+  const svgEl = wrap.querySelector('svg');
+  const homeBox = RJ_MAP_VIEWBOX.split(' ').map(Number); // [x, y, w, h]
+  const homeW = homeBox[2], homeH = homeBox[3];
+  const minW = homeW / 8; // zoom máximo: 8x
+  let box = { x:homeBox[0], y:homeBox[1], w:homeW, h:homeH };
+
+  function applyBox(){
+    svgEl.setAttribute('viewBox', `${box.x} ${box.y} ${box.w} ${box.h}`);
+  }
+  function clampBox(){
+    box.w = Math.min(homeW, Math.max(minW, box.w));
+    box.h = box.w * (homeH / homeW);
+    box.x = Math.min(homeBox[0] + homeW - box.w, Math.max(homeBox[0], box.x));
+    box.y = Math.min(homeBox[1] + homeH - box.h, Math.max(homeBox[1], box.y));
+  }
+  function updateZoomButtons(){
+    const atHome = Math.abs(box.w - homeW) < 0.5;
+    const atMax = box.w <= minW + 0.5;
+    const zoomOutBtn = wrap.querySelector('.map-zoom-out');
+    const resetBtn = wrap.querySelector('.map-zoom-reset');
+    const zoomInBtn = wrap.querySelector('.map-zoom-in');
+    if(zoomOutBtn) zoomOutBtn.disabled = atHome;
+    if(resetBtn) resetBtn.disabled = atHome;
+    if(zoomInBtn) zoomInBtn.disabled = atMax;
+  }
+  function zoomAt(factor, cx, cy){
+    const newW = box.w * factor;
+    const newH = box.h * factor;
+    box.x = cx - (cx - box.x) * factor;
+    box.y = cy - (cy - box.y) * factor;
+    box.w = newW; box.h = newH;
+    clampBox();
+    applyBox();
+    updateZoomButtons();
+  }
+  function resetBox(){
+    box = { x:homeBox[0], y:homeBox[1], w:homeW, h:homeH };
+    applyBox();
+    updateZoomButtons();
+  }
+  function clientToSvgPoint(clientX, clientY){
+    const rect = svgEl.getBoundingClientRect();
+    const px = rect.width ? (clientX - rect.left) / rect.width : 0.5;
+    const py = rect.height ? (clientY - rect.top) / rect.height : 0.5;
+    return { x: box.x + px * box.w, y: box.y + py * box.h };
+  }
+
+  wrap.querySelector('.map-zoom-in').addEventListener('click', ()=>{
+    zoomAt(0.7, box.x + box.w/2, box.y + box.h/2);
+  });
+  wrap.querySelector('.map-zoom-out').addEventListener('click', ()=>{
+    zoomAt(1/0.7, box.x + box.w/2, box.y + box.h/2);
+  });
+  wrap.querySelector('.map-zoom-reset').addEventListener('click', resetBox);
+
+  svgEl.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const pt = clientToSvgPoint(e.clientX, e.clientY);
+    const factor = e.deltaY < 0 ? 0.85 : 1/0.85;
+    zoomAt(factor, pt.x, pt.y);
+  }, { passive:false });
+
+  svgEl.addEventListener('dblclick', e=>{
+    const pt = clientToSvgPoint(e.clientX, e.clientY);
+    zoomAt(0.5, pt.x, pt.y);
+  });
+
+  const activePointers = new Map();
+  let dragging = false, moved = false, dragStart = null;
+  let pinchStartDist = null, pinchStartBox = null, pinchCenterSvg = null;
+
+  svgEl.addEventListener('pointerdown', e=>{
+    activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if(activePointers.size === 1){
+      // não capturamos o pointer ainda: só ao confirmar um arraste de verdade (ver pointermove),
+      // senão um clique simples num marcador seria "retargetado" para o <svg> e nunca chegaria no pino.
+      dragging = true; moved = false;
+      dragStart = { clientX:e.clientX, clientY:e.clientY, boxX:box.x, boxY:box.y, pointerId:e.pointerId };
+    } else if(activePointers.size === 2){
+      dragging = false;
+      svgEl.setPointerCapture(e.pointerId); // gesto de pinça: nunca é um clique, capturar é seguro aqui
+      const pts = Array.from(activePointers.values());
+      pinchStartDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
+      pinchStartBox = { ...box };
+      const midX = (pts[0].x+pts[1].x)/2, midY = (pts[0].y+pts[1].y)/2;
+      pinchCenterSvg = clientToSvgPoint(midX, midY);
+    }
+  });
+
+  svgEl.addEventListener('pointermove', e=>{
+    if(!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+    if(activePointers.size === 2 && pinchStartDist){
+      const pts = Array.from(activePointers.values());
+      const newDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
+      const factor = pinchStartDist / newDist;
+      box.w = pinchStartBox.w * factor;
+      box.h = pinchStartBox.h * factor;
+      box.x = pinchCenterSvg.x - (pinchCenterSvg.x - pinchStartBox.x) * factor;
+      box.y = pinchCenterSvg.y - (pinchCenterSvg.y - pinchStartBox.y) * factor;
+      clampBox();
+      applyBox();
+      updateZoomButtons();
+      moved = true;
+      return;
+    }
+
+    if(dragging && activePointers.size === 1){
+      const rect = svgEl.getBoundingClientRect();
+      const dxPx = e.clientX - dragStart.clientX;
+      const dyPx = e.clientY - dragStart.clientY;
+      if(!moved && (Math.abs(dxPx) > 3 || Math.abs(dyPx) > 3)){
+        moved = true;
+        svgEl.setPointerCapture(dragStart.pointerId); // agora é seguro: já é um arraste de verdade
+        svgEl.classList.add('dragging');
+      }
+      if(!moved) return;
+      box.x = dragStart.boxX - dxPx * (box.w / rect.width);
+      box.y = dragStart.boxY - dyPx * (box.h / rect.height);
+      clampBox();
+      applyBox();
+    }
+  });
+
+  function releasePointer(e){
+    activePointers.delete(e.pointerId);
+    if(activePointers.size < 2) pinchStartDist = null;
+    if(activePointers.size === 0){
+      dragging = false;
+      svgEl.classList.remove('dragging');
+    }
+  }
+  svgEl.addEventListener('pointerup', releasePointer);
+  svgEl.addEventListener('pointercancel', releasePointer);
+  svgEl.addEventListener('pointerleave', e=>{ if(activePointers.has(e.pointerId)) releasePointer(e); });
+
+  // impede que o "click" nativo disparado após um arraste ative um marcador sob o cursor
+  svgEl.addEventListener('click', e=>{
+    if(moved){ e.stopPropagation(); e.preventDefault(); moved = false; }
+  }, true);
+
+  updateZoomButtons();
 }
 
 /* ---- matriz AxR ---- */
@@ -1851,6 +2149,35 @@ function goToTransversais(){
   });
 }
 
+function goToReunioesFiltered(camaraId, eixoTema){
+  reunioesFilter = { camaraId: camaraId||'', eixoTema: eixoTema||'' };
+  showView('reunioes');
+  requestAnimationFrame(()=>{
+    const camaraSel = document.getElementById('reunioesCamaraFilter');
+    const eixoSel = document.getElementById('reunioesEixoFilter');
+    camaraSel.value = reunioesFilter.camaraId;
+    populateEixoFilterSelect(eixoSel, reunioesFilter.camaraId);
+    eixoSel.value = reunioesFilter.eixoTema;
+    renderReunioes();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+}
+
+function goToAcoesFiltered(camaraId, eixoTema){
+  acoesFilter = { camaraId: camaraId||'', eixoTema: eixoTema||'' };
+  showView('acoes');
+  requestAnimationFrame(()=>{
+    const camaraSel = document.getElementById('acoesCamaraFilter');
+    const eixoSel = document.getElementById('acoesEixoFilter');
+    camaraSel.value = acoesFilter.camaraId;
+    populateEixoFilterSelect(eixoSel, acoesFilter.camaraId);
+    eixoSel.value = acoesFilter.eixoTema;
+    renderAcoes();
+    renderAcoesMap();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+}
+
 function goToStat(view, targetIds=[]){
   showView(view);
   if(!targetIds || !targetIds.length){
@@ -1890,6 +2217,52 @@ if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matche
 
 document.getElementById('pdfOpenBtn').href = DECRETO_PDF_URL;
 document.getElementById('pdfDownloadBtn').href = DECRETO_PDF_URL;
+
+/* filtros de Câmara/Eixo — Reuniões e Ações */
+const reunioesCamaraSel = document.getElementById('reunioesCamaraFilter');
+const reunioesEixoSel = document.getElementById('reunioesEixoFilter');
+populateCamaraFilterSelect(reunioesCamaraSel);
+populateEixoFilterSelect(reunioesEixoSel, '');
+reunioesCamaraSel.addEventListener('change', ()=>{
+  reunioesFilter.camaraId = reunioesCamaraSel.value;
+  reunioesFilter.eixoTema = '';
+  populateEixoFilterSelect(reunioesEixoSel, reunioesFilter.camaraId);
+  renderReunioes();
+});
+reunioesEixoSel.addEventListener('change', ()=>{
+  reunioesFilter.eixoTema = reunioesEixoSel.value;
+  renderReunioes();
+});
+document.getElementById('reunioesFilterClear').addEventListener('click', ()=>{
+  reunioesFilter = {camaraId:'', eixoTema:''};
+  reunioesCamaraSel.value = '';
+  populateEixoFilterSelect(reunioesEixoSel, '');
+  renderReunioes();
+});
+
+const acoesCamaraSel = document.getElementById('acoesCamaraFilter');
+const acoesEixoSel = document.getElementById('acoesEixoFilter');
+populateCamaraFilterSelect(acoesCamaraSel);
+populateEixoFilterSelect(acoesEixoSel, '');
+acoesCamaraSel.addEventListener('change', ()=>{
+  acoesFilter.camaraId = acoesCamaraSel.value;
+  acoesFilter.eixoTema = '';
+  populateEixoFilterSelect(acoesEixoSel, acoesFilter.camaraId);
+  renderAcoes();
+  renderAcoesMap();
+});
+acoesEixoSel.addEventListener('change', ()=>{
+  acoesFilter.eixoTema = acoesEixoSel.value;
+  renderAcoes();
+  renderAcoesMap();
+});
+document.getElementById('acoesFilterClear').addEventListener('click', ()=>{
+  acoesFilter = {camaraId:'', eixoTema:''};
+  acoesCamaraSel.value = '';
+  populateEixoFilterSelect(acoesEixoSel, '');
+  renderAcoes();
+  renderAcoesMap();
+});
 
 renderStats();
 renderCharts();
