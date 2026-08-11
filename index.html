@@ -153,6 +153,8 @@
   table.dtable tbody tr{transition:background .1s;}
   table.dtable tbody tr:nth-child(even){background:var(--page);}
   table.dtable tbody tr:hover{background:var(--brand-soft);}
+  .org-site-link{color:var(--brand); text-decoration:none; font-size:11.5px; font-weight:700; margin-left:8px; white-space:nowrap;}
+  .org-site-link:hover{text-decoration:underline;}
   /* decree accordion */
   .accordion-item{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; background:var(--surface-1); transition:border-color .12s, box-shadow .12s; box-shadow:var(--shadow-1);}
   .accordion-item.open{border-color:var(--brand); box-shadow:var(--shadow-2);}
@@ -428,6 +430,21 @@
     font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;
     margin-bottom:10px;
   }
+  /* módulo de alertas e alarmes */
+  .alerta-tipos-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;}
+  .alerta-tipo-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-1); padding:16px 18px; box-shadow:var(--shadow-1);}
+  .alerta-tipo-icon{
+    width:34px; height:34px; border-radius:9px; background:var(--brand-soft); color:var(--brand);
+    display:flex; align-items:center; justify-content:center; margin-bottom:10px;
+  }
+  .alerta-tipo-titulo{font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:6px;}
+  .alerta-tipo-desc{font-size:12.5px; color:var(--text-secondary); line-height:1.6;}
+  .alertas-list{display:flex; flex-direction:column; gap:12px;}
+  .alerta-card{
+    border:1px solid var(--border); border-radius:12px; padding:14px 18px; background:var(--surface-1); box-shadow:var(--shadow-1);
+  }
+  .alerta-toprow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .alerta-formato{font-size:12px; color:var(--text-muted); font-weight:600;}
   /* módulo de reuniões */
   .reunioes-list{display:flex; flex-direction:column; gap:12px;}
   .reuniao-card{
@@ -909,6 +926,28 @@
       <div class="resource-list" id="paineisIntelList"></div>
     </section>
 
+    <!-- ================= MÓDULO 7: ALERTAS E ALARMES ================= -->
+    <section class="view" id="view-alertas">
+      <div class="view-header">
+        <button class="back-link" type="button" onclick="showView('roadmap')">← Voltar ao Roadmap do Sistema</button>
+        <div class="eyebrow">Módulo 7 do Roadmap · em desenvolvimento</div>
+        <h1>Módulo de Alertas e Alarmes</h1>
+        <p class="view-intro">Registro dos alertas e alarmes enviados à população pela Defesa Civil, com abrangência, vigência e descrição de cada envio.</p>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Seção A · Tipos de Alerta</div>
+        <p class="module-section-intro">Três canais são usados para alertar a população, cada um com alcance e finalidade diferentes.</p>
+        <div class="alerta-tipos-grid" id="alertaTiposGrid"></div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Seção B · Alertas Enviados</div>
+        <p class="module-section-intro">Amostra estática (v0.1) dos alertas já enviados. Na versão completa deste módulo, cada novo envio será registrado automaticamente pelo sistema.</p>
+        <div class="alertas-list" id="alertasList"></div>
+      </div>
+    </section>
+
     <!-- Lightbox para ampliar as imagens das ações -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
       <button class="lightbox-close" type="button" aria-label="Fechar" onclick="closeLightbox(event)">✕</button>
@@ -964,24 +1003,24 @@ const AGRIC_REUNIAO_FOTO4_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAYGBgYHBgcICAc
 const AGRIC_REUNIAO_FOTO4_URL = 'data:image/jpeg;base64,' + AGRIC_REUNIAO_FOTO4_B64;
 
 const orgaosArt5 = [
-  {n:'I',   sigla:'SEDEC',    nome:'Secretaria de Estado de Defesa Civil'},
-  {n:'II',  sigla:'CBMERJ',   nome:'Corpo de Bombeiros Militar do Estado do Rio de Janeiro'},
-  {n:'III', sigla:'SES',      nome:'Secretaria de Estado de Saúde'},
-  {n:'IV',  sigla:'SEAPPADI', nome:'Secretaria de Estado de Agricultura, Pecuária e Abastecimento'},
-  {n:'V',   sigla:'SEAS',     nome:'Secretaria de Estado do Ambiente e Sustentabilidade'},
-  {n:'VI',  sigla:'SEDSODH',  nome:'Secretaria de Estado de Desenvolvimento Social e Direitos Humanos'},
-  {n:'VII', sigla:'SEEDUC',   nome:'Secretaria de Estado de Educação'},
-  {n:'VIII',sigla:'—',        nome:'Secretaria de Estado de Segurança Pública'},
-  {n:'IX',  sigla:'Casa Civil', nome:'Secretaria de Estado da Casa Civil'},
-  {n:'X',   sigla:'SEGOV',    nome:'Secretaria de Estado de Governo'},
-  {n:'XI',  sigla:'SEENEMAR', nome:'Secretaria de Estado de Energia e Economia do Mar'},
-  {n:'XII', sigla:'—',        nome:'Secretaria de Estado de Desenvolvimento Econômico, Indústria, Comércio e Serviços'},
-  {n:'XIII',sigla:'DRM',      nome:'Departamento de Recursos Minerais'},
-  {n:'XIV', sigla:'INEA',     nome:'Instituto Estadual do Ambiente'},
-  {n:'XV',  sigla:'AGENERSA', nome:'Agência Estadual de Energia e Saneamento Básico'},
-  {n:'XVI', sigla:'SEIOP',    nome:'Secretaria de Estado de Infraestrutura e Obras Públicas'},
-  {n:'XVII',sigla:'—',        nome:'Secretaria de Estado de Ciência, Tecnologia e Inovação'},
-  {n:'XVIII',sigla:'SEPLAG',  nome:'Secretaria de Estado de Planejamento e Gestão'},
+  {n:'I',   sigla:'SEDEC',    nome:'Secretaria de Estado de Defesa Civil', site:'https://www.defesacivil.rj.gov.br/'},
+  {n:'II',  sigla:'CBMERJ',   nome:'Corpo de Bombeiros Militar do Estado do Rio de Janeiro', site:'https://www.cbmerj.rj.gov.br/'},
+  {n:'III', sigla:'SES',      nome:'Secretaria de Estado de Saúde', site:'https://www.saude.rj.gov.br/'},
+  {n:'IV',  sigla:'SEAPPADI', nome:'Secretaria de Estado de Agricultura, Pecuária e Abastecimento', site:'https://www.rj.gov.br/agricultura/'},
+  {n:'V',   sigla:'SEAS',     nome:'Secretaria de Estado do Ambiente e Sustentabilidade', site:'https://www.seas.rj.gov.br/'},
+  {n:'VI',  sigla:'SEDSODH',  nome:'Secretaria de Estado de Desenvolvimento Social e Direitos Humanos', site:'https://www.secsocial.rj.gov.br/'},
+  {n:'VII', sigla:'SEEDUC',   nome:'Secretaria de Estado de Educação', site:'https://www.seeduc.rj.gov.br/'},
+  {n:'VIII',sigla:'—',        nome:'Secretaria de Estado de Segurança Pública', site:'https://www.rj.gov.br/seguranca/'},
+  {n:'IX',  sigla:'Casa Civil', nome:'Secretaria de Estado da Casa Civil', site:'https://www.casacivil.rj.gov.br/'},
+  {n:'X',   sigla:'SEGOV',    nome:'Secretaria de Estado de Governo', site:'https://www.rj.gov.br/segov/'},
+  {n:'XI',  sigla:'SEENEMAR', nome:'Secretaria de Estado de Energia e Economia do Mar', site:'https://www.seenemar.rj.gov.br/'},
+  {n:'XII', sigla:'—',        nome:'Secretaria de Estado de Desenvolvimento Econômico, Indústria, Comércio e Serviços', site:'https://www.desenvolvimentoeconomico.rj.gov.br/'},
+  {n:'XIII',sigla:'DRM',      nome:'Departamento de Recursos Minerais', site:'https://www.drm.rj.gov.br/'},
+  {n:'XIV', sigla:'INEA',     nome:'Instituto Estadual do Ambiente', site:'https://www.inea.rj.gov.br/'},
+  {n:'XV',  sigla:'AGENERSA', nome:'Agência Estadual de Energia e Saneamento Básico', site:'https://www.rj.gov.br/agenersa/'},
+  {n:'XVI', sigla:'SEIOP',    nome:'Secretaria de Estado de Infraestrutura e Obras Públicas', site:'https://www.rj.gov.br/seiop/'},
+  {n:'XVII',sigla:'—',        nome:'Secretaria de Estado de Ciência, Tecnologia e Inovação', site:'https://secti.rj.gov.br/'},
+  {n:'XVIII',sigla:'SEPLAG',  nome:'Secretaria de Estado de Planejamento e Gestão', site:'https://www.planejamento.rj.gov.br/'},
 ];
 // aliases used inside CT sheets that refer to the same art.5 org
 const aliasMap = { 'SEAPPADI':'SEAPPADI', 'Casa Civil':'Casa Civil' };
@@ -1189,6 +1228,8 @@ const modules = [
   desc:'Integração com a Sala de Situação/NI²AD: painéis gerenciais e produtos de monitoramento para apoio à tomada de decisão (art. 4º, XII). Já iniciado neste v0.1 com os painéis externos já disponíveis.'},
  {n:'06', title:'Matérias e Reportagens', reqs:['frontend'], view:'materias',
   desc:'Curadoria de vídeos, reportagens e publicações em redes sociais sobre o El Niño e seus efeitos — repositório de referência para comunicação e contextualização do Comitê. Já iniciado neste v0.1.'},
+ {n:'07', title:'Módulo de Alertas e Alarmes', reqs:['backend'], view:'alertas',
+  desc:'Registro dos alertas e alarmes enviados à população — via SMS, Sirenes de Alarme e Cell Broadcast —, com abrangência, vigência e descrição de cada envio, além da explicação de cada tipo de alerta. Amostra estática (v0.1) já iniciada.'},
 ];
 
 /* ---- Módulo de Legislação: base legal de referência ---- */
@@ -1428,7 +1469,7 @@ const reunioes = [
    assunto:'Reunião de Alinhamento',
    responsavel:'Cel Joelson',
    participantes:'SEDEC-RJ: Cel Joelson, TC Manoel Dias, Maj Felipe Oliveira, Marcelo Abelheira',
-   local:'SEAPPA',
+   local:'SEAPPADI',
    imgUrls:[AGRIC_REUNIAO_FOTO1_URL, AGRIC_REUNIAO_FOTO2_URL, AGRIC_REUNIAO_FOTO3_URL, AGRIC_REUNIAO_FOTO4_URL]
  },
 ];
@@ -1936,7 +1977,7 @@ function renderOrgaos(){
        const eixosList = Array.from(camarasObj[n]).join('; ');
        return `<span class="chip coord" title="Eixo(s): ${eixosList}">${camaraLabel(n)}</span>`;
      }).join(' ') : '<span class="flag warn">não mapeado ainda</span>';
-     return `<tr><td>${o.n}</td><td><b>${o.sigla}</b></td><td>${o.nome}</td><td>${cell}</td></tr>`;
+     return `<tr><td>${o.n}</td><td><b>${o.sigla}</b></td><td>${o.nome}${o.site?` <a class="org-site-link" href="${o.site}" target="_blank" rel="noopener">Site ↗</a>`:''}</td><td>${cell}</td></tr>`;
    }).join('')}</tbody>`;
   tableWrap.appendChild(table);
 
@@ -2005,6 +2046,54 @@ function renderLegislacao(){
 const igIcon = `<svg class="ig-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
 const pdfIcon = `<svg class="ig-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>`;
 const avisoIcon = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+/* ---- módulo de alertas e alarmes ---- */
+const smsIcon = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+const sireneIcon = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-9.33-5"/><path d="M13.24 3.35A6 6 0 0 1 18 8v7H2v-.5a3.5 3.5 0 0 1 3.5-3.5v-3a6 6 0 0 1 3.24-5.32"/><line x1="21" y1="20" x2="3" y2="20"/><line x1="12" y1="4" x2="12" y2="2"/></svg>`;
+const cellBroadcastIcon = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/><path d="M4.5 8.5a8 8 0 0 1 0 7"/><path d="M19.5 8.5a8 8 0 0 1 0 7"/></svg>`;
+const ALERTA_TIPO_ICONS = { 'SMS': smsIcon, 'Sirene de Alarme': sireneIcon, 'Cell Broadcast': cellBroadcastIcon };
+const alertaTipos = [
+ {
+   titulo:'SMS (Mensagem de Texto)',
+   tipo:'SMS',
+   desc:'Mensagem de texto enviada a números de telefone previamente cadastrados ou identificados na área de risco, distribuída pelas operadoras de telefonia móvel. Usado para públicos mais específicos, como lideranças comunitárias e moradores cadastrados em áreas de risco.'
+ },
+ {
+   titulo:'Sirenes de Alarme',
+   tipo:'Sirene de Alarme',
+   desc:'Alarme sonoro instalado em pontos fixos de áreas de risco (encostas, margens de rio), acionado pela Defesa Civil para sinalizar, de forma imediata e local, a necessidade de evacuação da população naquele ponto específico.'
+ },
+ {
+   titulo:'Cell Broadcast',
+   tipo:'Cell Broadcast',
+   desc:'Tecnologia usada pelo sistema nacional "Defesa Civil Alerta" (ANATEL/MIDR): envia uma notificação em tela cheia, simultaneamente, a todos os aparelhos compatíveis conectados a redes 4G/5G dentro da área em risco — sem necessidade de cadastro prévio ou número de telefone. Operação plena em todo o Brasil desde 1º/10/2025.'
+ },
+];
+/* amostra estática (v0.1) — alertas reais enviados via SMS (Alerta via IDAP, SEDEC-RJ/CEMADEN-RJ) */
+const alertas = [
+ {
+   tipo:'SMS', formato:'Alerta via IDAP', origem:'SEDEC-RJ / CEMADEN-RJ',
+   dataSort:'2026-08-09', data:'09/08/2026',
+   assunto:'Rajadas de Vento',
+   abrangencia:'Todos os municípios não autônomos das regiões Costa Verde, Sul II, Baixada Fluminense, Metropolitana e Baixada Litorânea',
+   vigencia:'10h40 de 09/08 até 00h00 de 10/08',
+   descricao:'A passagem de uma frente fria favorece a ocorrência de rajadas de ventos moderados a fortes hoje (09/08).'
+ },
+ {
+   tipo:'SMS', formato:'Alerta via IDAP', origem:'SEDEC-RJ / CEMADEN-RJ',
+   dataSort:'2026-08-09', data:'09/08/2026',
+   assunto:'Baixa Umidade Relativa do Ar',
+   abrangencia:'Todos os municípios não autônomos da Região Baixada Litorânea',
+   vigencia:'11h00 até 19h00 de 09/08',
+   descricao:'Um sistema de alta pressão favorece a ocorrência de umidade relativa do ar abaixo de 30% hoje (09/08).'
+ },
+ {
+   tipo:'Cell Broadcast', formato:'Defesa Civil Alerta (Cell Broadcast)', origem:'SEDEC-RJ',
+   dataSort:'2026-08-07', data:'07/08/2026',
+   assunto:'Vendaval',
+   abrangencia:'Dezenas de municípios do estado, distribuídos entre várias REDECs (Regionais de Defesa Civil)',
+   descricao:'Alerta enviado via Cell Broadcast em razão de vendaval.'
+ },
+];
 const recursoCatIcons = {
   'Transporte': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h3.5l3 4v4h-6.5"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>`,
   'Equipamentos': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
@@ -2067,6 +2156,37 @@ function renderMaterias(){
   });
 }
 function renderPaineisIntel(){ renderResourceList('paineisIntelList', paineisIntel); }
+function renderAlertaTipos(){
+  const wrap = document.getElementById('alertaTiposGrid');
+  wrap.innerHTML = '';
+  alertaTipos.forEach(t=>{
+    const card = el('div','alerta-tipo-card');
+    card.innerHTML = `
+      <div class="alerta-tipo-icon">${ALERTA_TIPO_ICONS[t.tipo]||''}</div>
+      <div class="alerta-tipo-titulo">${t.titulo}</div>
+      <div class="alerta-tipo-desc">${t.desc}</div>`;
+    wrap.appendChild(card);
+  });
+}
+function renderAlertas(){
+  const wrap = document.getElementById('alertasList');
+  wrap.innerHTML = '';
+  const sorted = alertas.slice().sort((a,b)=> (b.dataSort||'').localeCompare(a.dataSort||''));
+  sorted.forEach(a=>{
+    const card = el('div','alerta-card');
+    card.innerHTML = `
+      <div class="alerta-toprow">
+        <span class="resource-tag">${ALERTA_TIPO_ICONS[a.tipo]||''}${a.tipo}</span>
+        <span class="alerta-formato">${a.formato}</span>
+        <span class="resource-fonte">${a.data}${a.origem?' · '+a.origem:''}</span>
+      </div>
+      <div class="reuniao-row"><b>Assunto:</b> ${a.assunto}</div>
+      <div class="reuniao-row"><b>Abrangência:</b> ${a.abrangencia}</div>
+      ${a.vigencia?`<div class="reuniao-row"><b>Vigência:</b> ${a.vigencia}</div>`:''}
+      <div class="reuniao-row"><b>Descrição:</b> ${a.descricao}</div>`;
+    wrap.appendChild(card);
+  });
+}
 
 /* ---- módulo de reuniões ---- */
 let reunioesFilter = { camaraId:'', eixoTema:'' };
@@ -2778,6 +2898,8 @@ renderRoadmap();
 renderLegislacao();
 renderPlanosDados();
 renderPaineisIntel();
+renderAlertaTipos();
+renderAlertas();
 renderRecursos();
 renderReunioes();
 renderAcoes();
