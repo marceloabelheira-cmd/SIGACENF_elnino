@@ -944,6 +944,26 @@
       <div class="module-section">
         <div class="module-section-label">Seção B · Alertas Enviados</div>
         <p class="module-section-intro">Amostra estática (v0.1) dos alertas já enviados. Na versão completa deste módulo, cada novo envio será registrado automaticamente pelo sistema.</p>
+
+        <div class="filter-bar">
+          <div class="filter-field">
+            <label for="alertasSortFilter">Ordenar por</label>
+            <select class="filter-select" id="alertasSortFilter">
+              <option value="desc">Data (mais recente primeiro)</option>
+              <option value="asc">Data (mais antiga primeiro)</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label>Tipo de alerta</label>
+            <div class="acoes-map-legend" id="alertasTipoLegend">
+              <button type="button" class="legend-toggle active" data-tipo="SMS"><span class="legend-dot" style="background:var(--brand);"></span>SMS</button>
+              <button type="button" class="legend-toggle active" data-tipo="Sirene de Alarme"><span class="legend-dot" style="background:#e8a90f;"></span>Sirene de Alarme</button>
+              <button type="button" class="legend-toggle active" data-tipo="Cell Broadcast"><span class="legend-dot" style="background:#0ca30c;"></span>Cell Broadcast</button>
+            </div>
+          </div>
+          <button type="button" class="filter-clear-btn" id="alertasFilterClear">Limpar filtro</button>
+        </div>
+
         <div class="alertas-list" id="alertasList"></div>
       </div>
     </section>
@@ -2093,6 +2113,22 @@ const alertas = [
    abrangencia:'Dezenas de municípios do estado, distribuídos entre várias REDECs (Regionais de Defesa Civil)',
    descricao:'Alerta enviado via Cell Broadcast em razão de vendaval.'
  },
+ {
+   tipo:'SMS', formato:'Alerta via IDAP', origem:'SEDEC-RJ / CEMADEN-RJ',
+   dataSort:'2026-08-06', data:'06/08/2026',
+   assunto:'Rajadas de Vento',
+   abrangencia:'Todos os municípios não autônomos do estado',
+   vigencia:'18h00 de 06/08 até 12h00 de 07/08',
+   descricao:'Um sistema de alta pressão favorece a ocorrência de rajadas de ventos moderados a muito fortes até amanhã (07/08).'
+ },
+ {
+   tipo:'SMS', formato:'Alerta via IDAP', origem:'SEDEC-RJ / CEMADEN-RJ',
+   dataSort:'2026-08-06', data:'06/08/2026',
+   assunto:'Baixa Umidade Relativa do Ar',
+   abrangencia:'Todos os municípios não autônomos das regiões Sul II, Baixada Fluminense, Baixada Litorânea, Metropolitana e Norte',
+   vigencia:'13h00 até 19h00 de 06/08',
+   descricao:'Um sistema de alta pressão favorece a ocorrência de umidade relativa do ar abaixo de 30% hoje (06/08).'
+ },
 ];
 const recursoCatIcons = {
   'Transporte': `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h3.5l3 4v4h-6.5"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>`,
@@ -2168,10 +2204,20 @@ function renderAlertaTipos(){
     wrap.appendChild(card);
   });
 }
+let alertasTipoFilter = new Set(['SMS','Sirene de Alarme','Cell Broadcast']);
+let alertasSortOrder = 'desc';
 function renderAlertas(){
   const wrap = document.getElementById('alertasList');
   wrap.innerHTML = '';
-  const sorted = alertas.slice().sort((a,b)=> (b.dataSort||'').localeCompare(a.dataSort||''));
+  const filtrados = alertas.filter(a=> alertasTipoFilter.has(a.tipo));
+  if(!filtrados.length){
+    wrap.innerHTML = '<div class="filter-empty">Nenhum alerta encontrado para este filtro.</div>';
+    return;
+  }
+  const sorted = filtrados.slice().sort((a,b)=>{
+    const cmp = (a.dataSort||'').localeCompare(b.dataSort||'');
+    return alertasSortOrder === 'asc' ? cmp : -cmp;
+  });
   sorted.forEach(a=>{
     const card = el('div','alerta-card');
     card.innerHTML = `
@@ -2885,6 +2931,31 @@ document.querySelectorAll('#acoesStatusLegend .legend-toggle').forEach(btn=>{
     renderAcoes();
     renderAcoesMap();
   });
+});
+
+document.getElementById('alertasSortFilter').addEventListener('change', (e)=>{
+  alertasSortOrder = e.target.value;
+  renderAlertas();
+});
+document.querySelectorAll('#alertasTipoLegend .legend-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const tipo = btn.dataset.tipo;
+    if(alertasTipoFilter.has(tipo)){
+      alertasTipoFilter.delete(tipo);
+      btn.classList.remove('active');
+    } else {
+      alertasTipoFilter.add(tipo);
+      btn.classList.add('active');
+    }
+    renderAlertas();
+  });
+});
+document.getElementById('alertasFilterClear').addEventListener('click', ()=>{
+  alertasSortOrder = 'desc';
+  document.getElementById('alertasSortFilter').value = 'desc';
+  alertasTipoFilter = new Set(['SMS','Sirene de Alarme','Cell Broadcast']);
+  document.querySelectorAll('#alertasTipoLegend .legend-toggle').forEach(btn=> btn.classList.add('active'));
+  renderAlertas();
 });
 
 renderStats();
